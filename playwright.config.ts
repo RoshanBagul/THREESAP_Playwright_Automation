@@ -21,11 +21,11 @@ export default defineConfig({
 
         headless: false,
 
-        screenshot: 'only-on-failure',
+        screenshot: 'on',
 
-        video: 'retain-on-failure',
+        video: 'on',
 
-        trace: 'retain-on-failure',
+        trace: 'on',
 
         actionTimeout: 15000,
 
