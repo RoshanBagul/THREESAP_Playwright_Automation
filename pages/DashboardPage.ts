@@ -18,4 +18,9 @@ export class DashboardPage {
       'Dashboard should be visible after successful login'
     ).toBeVisible();
   }
+
+  async logout() {
+    await this.page.goto('/web/index.php/auth/logout');
+    await expect(this.page).toHaveURL(/\/auth\/login/);
+  }
 }

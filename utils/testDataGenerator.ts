@@ -1,5 +1,6 @@
 export function generateEmployeeId(): string {
-  return `EMP${Date.now()}`;
+  const suffix = Math.random().toString(36).slice(2, 8);
+  return `EMP${suffix}`;
 }
 
 export function generateUniqueEmployeeName() {
