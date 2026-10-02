@@ -12,6 +12,8 @@ import employeeData from '../data/employeeData.json';
 
 test.describe('OrangeHRM - Employee Lifecycle', () => {
   test('should add, edit, validate via API, delete and logout an employee', async ({ page, request }) => {
+    test.setTimeout(120000);
+
     const login = new LoginPage(page);
     const dashboard = new DashboardPage(page);
     const pim = new PimPage(page);

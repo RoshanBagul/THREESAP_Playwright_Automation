@@ -27,6 +27,10 @@ export default defineConfig({
 
         trace: 'on',
 
+        launchOptions: {
+            args: ['--start-maximized']
+        },
+
         actionTimeout: 15000,
 
         navigationTimeout: 30000

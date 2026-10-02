@@ -21,6 +21,7 @@ export class EmployeeApi {
   async createEmployee(employee: ApiEmployee) {
     const response = await this.request.post(`${this.baseURL}/api/users`, {
       headers: this.headers(),
+      timeout: 60000,
       data: { name: employee.name, job: employee.job, employeeId: employee.employeeId, employmentStatus: employee.employmentStatus }
     });
     expect(response.status(), 'Employee API create should return HTTP 201').toBe(201);
@@ -30,6 +31,7 @@ export class EmployeeApi {
   async updateEmployee(id: string, employee: ApiEmployee) {
     const response = await this.request.put(`${this.baseURL}/api/users/${id}`, {
       headers: this.headers(),
+      timeout: 60000,
       data: { name: employee.name, job: employee.job, employeeId: employee.employeeId, employmentStatus: employee.employmentStatus }
     });
     expect(response.status(), 'Employee API update should return HTTP 200').toBe(200);
@@ -37,7 +39,10 @@ export class EmployeeApi {
   }
 
   async deleteEmployee(id: string) {
-    const response = await this.request.delete(`${this.baseURL}/api/users/${id}`, { headers: this.headers() });
+    const response = await this.request.delete(`${this.baseURL}/api/users/${id}`, {
+      headers: this.headers(),
+      timeout: 60000
+    });
     expect(response.status(), 'Employee API delete should return HTTP 204').toBe(204);
   }
 }
