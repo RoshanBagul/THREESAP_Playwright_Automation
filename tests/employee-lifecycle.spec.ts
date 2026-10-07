@@ -1,4 +1,5 @@
-import { test, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
+import { test } from '../fixtures/employeeCleanup';
 import { LoginPage } from '../pages/LoginPage';
 import { DashboardPage } from '../pages/DashboardPage';
 import { PimPage } from '../pages/PimPage';
@@ -11,7 +12,7 @@ import { generateEmployeeId, generateUniqueEmployeeName } from '../utils/testDat
 import employeeData from '../data/employeeData.json';
 
 test.describe('OrangeHRM - Employee Lifecycle', { tag: '@regression' }, () => {
-  test('should add, edit, validate via API, delete and logout an employee', async ({ page, request }) => {
+  test('should add, edit, validate via API, delete and logout an employee', async ({ page, request, employeeCleanup }) => {
     test.setTimeout(120000);
 
     const login = new LoginPage(page);
@@ -33,6 +34,7 @@ test.describe('OrangeHRM - Employee Lifecycle', { tag: '@regression' }, () => {
 
     await pim.open();
     await pim.openAddEmployee();
+    employeeCleanup.trackUiEmployee(employeeId);
     await addEmployee.addEmployee({ firstName: names.firstName, lastName: names.lastName, employeeId });
 
     await pim.openEmployeeList();
@@ -52,6 +54,7 @@ test.describe('OrangeHRM - Employee Lifecycle', { tag: '@regression' }, () => {
       employeeId,
       employmentStatus
     });
+    employeeCleanup.trackApiEmployee(String(apiCreated.id));
 
     expect(apiCreated.name).toBe(`${names.firstName} ${names.lastName}`);
     expect(apiCreated.job).toBe(jobTitle);
@@ -72,8 +75,10 @@ test.describe('OrangeHRM - Employee Lifecycle', { tag: '@regression' }, () => {
     await employeeList.searchByEmployeeId(employeeId);
     await employeeList.deleteEmployee(employeeId);
     await employeeList.verifyEmployeeDeleted(employeeId);
+    employeeCleanup.markUiEmployeeDeleted(employeeId);
 
     await employeeApi.deleteEmployee(String(apiCreated.id));
+    employeeCleanup.markApiEmployeeDeleted(String(apiCreated.id));
 
     await dashboard.logout();
     await expect(page).toHaveURL(/\/auth\/login/);
