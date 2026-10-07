@@ -154,7 +154,13 @@ The Playwright config uses:
 - a fixed 1280x800 viewport across browsers
 - three CI workers so browser projects can run concurrently
 - headed mode enabled in local runs
-- screenshots, video, and traces retained on failure
+- screenshots and video retained on failure, with traces recorded on the first retry
+
+## Flaky Test Policy
+
+- CI retries failed tests up to two times; local runs do not retry by default.
+- A test that passes only after a retry is still reported as flaky and fails the CI job.
+- Failure screenshots, videos, and retry traces are uploaded with the Playwright report artifact.
 
 ## Reports
 

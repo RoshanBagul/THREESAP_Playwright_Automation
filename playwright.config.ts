@@ -9,6 +9,8 @@ export default defineConfig({
 
     retries: process.env.CI ? 2 : 0,
 
+    failOnFlakyTests: !!process.env.CI,
+
     workers: process.env.CI ? 3 : undefined,
 
     reporter: [
@@ -23,11 +25,11 @@ export default defineConfig({
 
         viewport: { width: 1280, height: 800 },
 
-        screenshot: 'on',
+        screenshot: 'only-on-failure',
 
-        video: 'on',
+        video: 'retain-on-failure',
 
-        trace: 'on',
+        trace: 'on-first-retry',
 
         actionTimeout: 15000,
 
