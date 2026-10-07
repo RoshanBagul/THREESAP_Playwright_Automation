@@ -9,7 +9,7 @@ export default defineConfig({
 
     retries: process.env.CI ? 2 : 0,
 
-    workers: process.env.CI ? 1 : undefined,
+    workers: process.env.CI ? 3 : undefined,
 
     reporter: [
         ['html', { outputFolder: 'playwright-report', open: 'never' }],
@@ -21,15 +21,13 @@ export default defineConfig({
 
         headless: !!process.env.CI,
 
+        viewport: { width: 1280, height: 800 },
+
         screenshot: 'on',
 
         video: 'on',
 
         trace: 'on',
-
-        launchOptions: {
-            args: ['--start-maximized']
-        },
 
         actionTimeout: 15000,
 
@@ -39,13 +37,15 @@ export default defineConfig({
     projects: [
         {
             name: 'chromium',
-            use: {
-                browserName: 'chromium',
-                viewport: null,
-                launchOptions: {
-                    args: ['--start-maximized']
-                }
-            }
+            use: { browserName: 'chromium' }
+        },
+        {
+            name: 'firefox',
+            use: { browserName: 'firefox' }
+        },
+        {
+            name: 'webkit',
+            use: { browserName: 'webkit' }
         }
     ]
 });

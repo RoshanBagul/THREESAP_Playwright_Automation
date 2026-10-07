@@ -9,7 +9,7 @@ The suite is built with:
 - Playwright
 - TypeScript
 - Page Object Model structure
-- Chromium browser automation
+- Chromium, Firefox, and WebKit browser automation
 - Headed browser execution for local validation
 
 ## Project Structure
@@ -46,7 +46,7 @@ From the project root:
 
 ```bash
 npm install
-npx playwright install chromium
+npx playwright install chromium firefox webkit
 ```
 
 On Windows, if `npm` is not recognized in PowerShell, first add Node to PATH or call it explicitly:
@@ -55,7 +55,7 @@ On Windows, if `npm` is not recognized in PowerShell, first add Node to PATH or 
 $env:PATH = "C:\Program Files\nodejs;$env:PATH"
 cd "D:\Automation\threesap_automation"
 npm install
-npx playwright install chromium
+npx playwright install chromium firefox webkit
 ```
 
 ## Run Tests
@@ -64,6 +64,12 @@ Run the default suite:
 
 ```bash
 npm test
+```
+
+Run all tests in Chromium, Firefox, and WebKit:
+
+```bash
+npm run test:cross-browser
 ```
 
 Run in headed mode:
@@ -78,11 +84,13 @@ Run in UI mode:
 npm run test:ui
 ```
 
-Run a specific spec:
+Run a specific spec in one browser:
 
 ```bash
 npx playwright test tests/login.spec.ts --project=chromium
 npx playwright test tests/employee-lifecycle.spec.ts --project=chromium
+npx playwright test tests/employee-lifecycle.spec.ts --project=firefox
+npx playwright test tests/employee-lifecycle.spec.ts --project=webkit
 ```
 
 ## Current Coverage
@@ -142,7 +150,9 @@ If a scenario fails, the relevant failure artifacts (including video) are saved 
 The Playwright config uses:
 
 - base URL: `https://opensource-demo.orangehrmlive.com`
-- Chromium project
+- Chromium, Firefox, and WebKit projects
+- a fixed 1280x800 viewport across browsers
+- three CI workers so browser projects can run concurrently
 - headed mode enabled in local runs
 - screenshots, video, and traces retained on failure
 

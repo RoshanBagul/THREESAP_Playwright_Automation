@@ -6,10 +6,24 @@ export class EmployeeListPage {
   private employeeIdFilter = this.page
     .locator('.oxd-input-group')
     .filter({ hasText: 'Employee Id' })
-    .locator('input')
+    .locator('input:visible')
     .first();
 
+  private employeeInformationToggle = this.page
+    .locator('.oxd-table-filter')
+    .filter({ hasText: 'Employee Information' })
+    .locator('.oxd-table-filter-header-options button.oxd-icon-button');
+
   async searchByEmployeeId(employeeId: string) {
+    const collapsedIcon = this.employeeInformationToggle.locator('.bi-caret-down-fill');
+    if (await collapsedIcon.isVisible()) {
+      await this.employeeInformationToggle.click();
+    }
+
+    await expect(
+      this.page.locator('.oxd-table-filter-area')
+    ).toBeVisible();
+    await expect(this.employeeIdFilter).toBeVisible();
     await this.employeeIdFilter.fill(employeeId);
     await this.page.getByRole('button', { name: 'Search' }).click();
   }
