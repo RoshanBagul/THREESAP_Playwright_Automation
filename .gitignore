@@ -3,6 +3,7 @@ playwright-report/
 test-results/
 allure-results/
 allure-report/
+/fixtures/.auth/
 .DS_Store
 .vscode/
 .idea/

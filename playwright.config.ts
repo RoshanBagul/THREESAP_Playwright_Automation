@@ -19,7 +19,7 @@ export default defineConfig({
     use: {
         baseURL: 'https://opensource-demo.orangehrmlive.com',
 
-        headless: false,
+        headless: !!process.env.CI,
 
         screenshot: 'on',
 
@@ -41,7 +41,6 @@ export default defineConfig({
             name: 'chromium',
             use: {
                 browserName: 'chromium',
-                headless: false,
                 viewport: null,
                 launchOptions: {
                     args: ['--start-maximized']

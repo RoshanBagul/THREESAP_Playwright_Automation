@@ -10,7 +10,7 @@ import { TEST_CONFIG } from '../utils/constants';
 import { generateEmployeeId, generateUniqueEmployeeName } from '../utils/testDataGenerator';
 import employeeData from '../data/employeeData.json';
 
-test.describe('OrangeHRM - Employee Lifecycle', () => {
+test.describe('OrangeHRM - Employee Lifecycle', { tag: '@regression' }, () => {
   test('should add, edit, validate via API, delete and logout an employee', async ({ page, request }) => {
     test.setTimeout(120000);
 

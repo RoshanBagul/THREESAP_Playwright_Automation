@@ -4,7 +4,7 @@ import { LoginPage } from '../pages/LoginPage';
 import { DashboardPage } from '../pages/DashboardPage';
 import { TEST_CONFIG } from '../utils/constants';
 
-test.describe('OrangeHRM Login', () => {
+test.describe('OrangeHRM Login', { tag: '@regression' }, () => {
 
     async function maximizeWindow(page: any) {
         await page.evaluate(() => {
@@ -15,7 +15,7 @@ test.describe('OrangeHRM Login', () => {
         });
     }
 
-    test('should login successfully', async ({ page }) => {
+    test('should login successfully', { tag: '@smoke' }, async ({ page }) => {
         await maximizeWindow(page);
 
         const loginPage = new LoginPage(page);
