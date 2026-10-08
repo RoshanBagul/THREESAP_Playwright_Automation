@@ -1,5 +1,8 @@
 import { defineConfig } from '@playwright/test';
+import path from 'node:path';
 import { ENVIRONMENT_CONFIG } from './utils/environment';
+
+const authFile = path.resolve(__dirname, '.auth/user.json');
 
 export default defineConfig({
     testDir: './tests',
@@ -39,16 +42,27 @@ export default defineConfig({
 
     projects: [
         {
-            name: 'chromium',
+            name: 'setup',
+            testMatch: /auth\.setup\.ts/,
             use: { browserName: 'chromium' }
         },
         {
+            name: 'chromium',
+            dependencies: ['setup'],
+            testIgnore: /auth\.setup\.ts/,
+            use: { browserName: 'chromium', storageState: authFile }
+        },
+        {
             name: 'firefox',
-            use: { browserName: 'firefox' }
+            dependencies: ['setup'],
+            testIgnore: /auth\.setup\.ts/,
+            use: { browserName: 'firefox', storageState: authFile }
         },
         {
             name: 'webkit',
-            use: { browserName: 'webkit' }
+            dependencies: ['setup'],
+            testIgnore: /auth\.setup\.ts/,
+            use: { browserName: 'webkit', storageState: authFile }
         }
     ]
 });

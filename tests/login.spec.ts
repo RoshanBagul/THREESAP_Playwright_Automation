@@ -4,6 +4,8 @@ import { LoginPage } from '../pages/LoginPage';
 import { DashboardPage } from '../pages/DashboardPage';
 import { TEST_CONFIG } from '../utils/constants';
 
+test.use({ storageState: { cookies: [], origins: [] } });
+
 test.describe('OrangeHRM Login', { tag: '@regression' }, () => {
 
     test('should login successfully', { tag: '@smoke' }, async ({ page }) => {

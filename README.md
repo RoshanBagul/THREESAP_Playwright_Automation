@@ -166,11 +166,13 @@ If a scenario fails, the relevant failure artifacts (including video) are saved 
 
 ## Main Test Files
 
+- `tests/auth.setup.ts` — authenticates once and saves browser storage state for reuse
 - `tests/login.spec.ts` — login and authentication validations
 - `tests/employee-lifecycle.spec.ts` — employee add/edit/delete lifecycle workflow
 
 ## Page Objects
 
+- `pages/BasePage.ts`
 - `pages/LoginPage.ts`
 - `pages/DashboardPage.ts`
 - `pages/PimPage.ts`
@@ -184,6 +186,8 @@ The Playwright config uses:
 
 - base URL from `ORANGEHRM_BASE_URL` in the selected environment configuration
 - Chromium, Firefox, and WebKit projects
+- a setup project that saves authenticated storage state to the ignored `.auth/` directory for reuse across browser projects
+- the login spec uses an empty storage state so authentication scenarios still exercise the login UI
 - a fixed 1280x800 viewport across browsers
 - three CI workers so browser projects can run concurrently
 - headed mode enabled in local runs

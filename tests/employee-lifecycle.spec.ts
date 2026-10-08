@@ -1,13 +1,11 @@
 import { expect } from '@playwright/test';
 import { test } from '../fixtures/employeeCleanup';
-import { LoginPage } from '../pages/LoginPage';
 import { DashboardPage } from '../pages/DashboardPage';
 import { PimPage } from '../pages/PimPage';
 import { AddEmployeePage } from '../pages/AddEmployeePage';
 import { EmployeeListPage } from '../pages/EmployeeListPage';
 import { EmployeeDetailsPage } from '../pages/EmployeeDetailsPage';
 import { EmployeeApi } from '../api/EmployeeApi';
-import { TEST_CONFIG } from '../utils/constants';
 import { generateEmployeeId, generateUniqueEmployeeName } from '../utils/testDataGenerator';
 import employeeData from '../data/employeeData.json';
 
@@ -15,7 +13,6 @@ test.describe('OrangeHRM - Employee Lifecycle', { tag: '@regression' }, () => {
   test('should add, edit, validate via API, delete and logout an employee', async ({ page, request, employeeCleanup }) => {
     test.setTimeout(120000);
 
-    const login = new LoginPage(page);
     const dashboard = new DashboardPage(page);
     const pim = new PimPage(page);
     const addEmployee = new AddEmployeePage(page);
@@ -28,9 +25,7 @@ test.describe('OrangeHRM - Employee Lifecycle', { tag: '@regression' }, () => {
     const jobTitle = employeeData.employee.jobTitle;
     const employmentStatus = employeeData.employee.employmentStatus;
 
-    await login.navigate();
-    await login.login(TEST_CONFIG.username, TEST_CONFIG.password);
-    await dashboard.verifyDashboard();
+    await dashboard.open();
 
     await pim.open();
     await pim.openAddEmployee();

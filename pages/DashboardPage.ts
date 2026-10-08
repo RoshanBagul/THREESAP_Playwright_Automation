@@ -18,6 +18,11 @@ export class DashboardPage extends BasePage {
     ).toBeVisible();
   }
 
+  async open() {
+    await this.page.goto('/web/index.php/dashboard/index');
+    await this.verifyDashboard();
+  }
+
   async logout() {
     await this.page.goto('/web/index.php/auth/logout');
     await this.verifyUrl(/\/auth\/login/);
