@@ -8,7 +8,7 @@ test.use({ storageState: { cookies: [], origins: [] } });
 
 test.describe('OrangeHRM Login', { tag: '@regression' }, () => {
 
-    test('should login successfully', { tag: '@smoke' }, async ({ page }) => {
+    test('should login successfully', { tag: ['@smoke', '@e2e'] }, async ({ page }) => {
         const loginPage = new LoginPage(page);
         const dashboardPage = new DashboardPage(page);
 

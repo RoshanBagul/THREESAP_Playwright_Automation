@@ -62,7 +62,8 @@ Runtime settings are loaded from environment variables. For local development, c
 Copy-Item .env.example .env.local
 ```
 
-The supported `TEST_ENV` values are `local` (the default), `staging`, and `production`.
+The supported `TEST_ENV` values are `local` (the default), `qa`, `staging`, and
+`production`.
 The runner loads `.env.<TEST_ENV>` first, then `.env` as a shared fallback; variables
 already set in the process take precedence over both files. Create files such as
 `.env.staging` for environment-specific settings. These files are ignored by Git.
@@ -84,10 +85,13 @@ Optionally configure
 `ORANGEHRM_ESS_USERNAME` and `ORANGEHRM_ESS_PASSWORD` as secrets to enable the ESS
 checks.
 
-To run against another local profile, set `TEST_ENV` before invoking Playwright:
+To run against another environment, provide its configuration in `.env.<name>` (for
+example `.env.qa`) and select it with `TEST_ENV`:
 
 ```powershell
-$env:TEST_ENV = "staging"
+Copy-Item .env.example .env.qa
+# Set the QA URL and credentials in .env.qa before running tests.
+$env:TEST_ENV = "qa"
 npm test
 ```
 
@@ -107,6 +111,34 @@ Run the default suite:
 ```bash
 npm test
 ```
+
+Run tests by tag:
+
+```bash
+npm run test:smoke
+npm run test:regression
+npm run test:e2e
+npm run test:api
+```
+
+Tests carry `@regression` at suite level; focused happy-path tests are additionally
+tagged `@smoke`, browser-driven workflow cases use `@e2e`, and the lifecycle test
+that validates the updated employee through OrangeHRM's PIM endpoint also uses
+`@api`. Tags can be combined with Playwright's `--grep` / `--grep-invert` options.
+
+## Test Data Management
+
+- Employee records are generated per test with cryptographically random identifiers
+  and names, so independent tests and parallel workers do not reuse employee data.
+- Shared selectable employee values (job title and employment status) live in
+  `data/employeeData.json`; assertions compare against those values instead of
+  duplicating them in test code.
+- Tests that create employees register the employee ID with the cleanup fixture
+  immediately. Fixture teardown deletes remaining records even when a later test
+  step fails; cleanup failures are logged and attached to the Playwright report.
+- Keep credentials and environment-specific URLs in `.env.<TEST_ENV>` or CI
+  variables/secrets. Do not store account credentials or generated test records in
+  committed fixtures.
 
 Run all tests in Chromium, Firefox, and WebKit:
 
@@ -193,9 +225,31 @@ The Playwright config uses:
 
 ## Flaky Test Policy
 
-- CI retries failed tests up to two times; local runs do not retry by default.
-- A test that passes only after a retry is still reported as flaky and fails the CI job.
-- Failure screenshots, videos, and retry traces are uploaded with the Playwright report artifact.
+### Detection and CI behavior
+
+- Local runs use no retries. CI retries a failed test up to two times to collect evidence and distinguish intermittent failures from consistent failures; retries are diagnostic, not a pass condition.
+- `failOnFlakyTests` is enabled in CI, so a test that fails and then passes on retry still fails the workflow. Do not increase retries to make a red test appear green.
+- CI retains failure screenshots, videos, and traces from the first retry. The `test-reports` artifact also includes the Playwright and Allure reports. Review the failed attempt and retry trace before changing a test.
+
+### Triage workflow
+
+1. Identify the first failing Playwright step and compare the original attempt with its retry. Check whether the failure is a locator/assertion timeout, navigation or authentication problem, test-data collision, cleanup failure, browser-specific issue, or an unavailable/rate-limited external service.
+2. Reproduce the affected spec and browser locally, first without retries:
+
+   ```bash
+   npx playwright test tests/<spec>.spec.ts --project=<chromium|firefox|webkit> --workers=1
+   ```
+
+   Use `--debug` or `--headed` when the failure needs visual inspection. Run the same command more than once only to establish that the failure is intermittent; keep the failing artifacts.
+3. Fix the cause, then rerun the targeted test without retries and run the relevant cross-browser coverage. Don’t land a change that only succeeds after retry.
+
+### Prevention guidelines
+
+- Prefer Playwright locator actions and auto-retrying assertions (`expect(locator).toBeVisible()`, `toHaveText()`, `toHaveURL()`) over fixed sleeps or manual polling. Add an explicit wait only for a specific observable state, not simply to wait for time to pass.
+- Keep tests isolated: generate unique employee IDs/data per test, avoid depending on execution order or shared mutable accounts, and register created data with the cleanup fixture immediately so it is removed even after a later assertion fails.
+- Keep UI and API checks targeted at the same created record. Avoid multiplying requests to public or rate-limited services across browser projects; use the configured OrangeHRM environment for its authenticated PIM API.
+- Treat environment availability and credentials separately from product failures. Confirm the selected `TEST_ENV`, URL, and required secrets are configured before diagnosing browser behavior; never log passwords, tokens, or authentication state.
+- If a genuine external outage prevents a test from running, report the outage and preserve the failed result/artifacts. Don’t silently catch the error, add broad skips, or weaken assertions to hide it.
 
 ## Reports
 

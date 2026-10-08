@@ -6,12 +6,12 @@ import { ENVIRONMENT_CONFIG } from '../utils/environment';
 import { ESS_TEST_CONFIG } from '../utils/constants';
 
 test.describe('OrangeHRM role-based navigation', { tag: '@regression' }, () => {
-  test('Admin can access administrative navigation', async ({ page }) => {
+  test('Admin can access administrative navigation', { tag: ['@e2e', '@smoke'] }, async ({ page }) => {
     await new DashboardPage(page).open();
     await new NavigationPage(page).verifyMenuItemsVisible(['Admin', 'PIM']);
   });
 
-  test('ESS can access self-service navigation but not administrative menus', async ({ browser, browserName }) => {
+  test('ESS can access self-service navigation but not administrative menus', { tag: '@e2e' }, async ({ browser, browserName }) => {
     test.skip(
       !ESS_TEST_CONFIG,
       'Configure ORANGEHRM_ESS_USERNAME and ORANGEHRM_ESS_PASSWORD to enable ESS role tests.'

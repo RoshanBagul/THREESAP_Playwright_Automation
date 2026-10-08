@@ -35,7 +35,7 @@ async function createEmployee(page: Page, trackEmployee: EmployeeCleanup['trackU
 test.describe('OrangeHRM - Employee Lifecycle', { tag: '@regression' }, () => {
   test.describe.configure({ timeout: TIMEOUTS.employeeWorkflowTest });
 
-  test('should create an employee and find it in the employee list', async ({ page, employeeCleanup }) => {
+  test('should create an employee and find it in the employee list', { tag: ['@e2e', '@smoke'] }, async ({ page, employeeCleanup }) => {
     const { employeeId } = await test.step('Create an employee', () =>
       createEmployee(page, employeeCleanup.trackUiEmployee));
 
@@ -49,7 +49,7 @@ test.describe('OrangeHRM - Employee Lifecycle', { tag: '@regression' }, () => {
     });
   });
 
-  test('should update employee details and verify them through the PIM API', async ({ page, employeeCleanup }) => {
+  test('should update employee details and verify them through the PIM API', { tag: ['@e2e', '@api'] }, async ({ page, employeeCleanup }) => {
     const { names, employeeId, employeeNumber } =
       await test.step('Create an employee for update verification', () =>
         createEmployee(page, employeeCleanup.trackUiEmployee));
@@ -83,7 +83,7 @@ test.describe('OrangeHRM - Employee Lifecycle', { tag: '@regression' }, () => {
     });
   });
 
-  test('should delete an employee from the employee list', async ({ page, employeeCleanup }) => {
+  test('should delete an employee from the employee list', { tag: '@e2e' }, async ({ page, employeeCleanup }) => {
     const { employeeId } = await test.step('Create an employee for deletion', () =>
       createEmployee(page, employeeCleanup.trackUiEmployee));
 
@@ -99,7 +99,7 @@ test.describe('OrangeHRM - Employee Lifecycle', { tag: '@regression' }, () => {
     });
   });
 
-  test('should log out and return to the login form', async ({ page }) => {
+  test('should log out and return to the login form', { tag: ['@e2e', '@smoke'] }, async ({ page }) => {
     const dashboard = new DashboardPage(page);
     const loginPage = new LoginPage(page);
 

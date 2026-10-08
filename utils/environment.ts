@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import path from 'node:path';
 
-const supportedEnvironments = ['local', 'staging', 'production'] as const;
+const supportedEnvironments = ['local', 'qa', 'staging', 'production'] as const;
 type TestEnvironment = (typeof supportedEnvironments)[number];
 
 const configuredEnvironment = process.env.TEST_ENV || 'local';

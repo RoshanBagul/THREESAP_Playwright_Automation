@@ -1,13 +1,14 @@
+import { randomBytes } from 'node:crypto';
+
 export function generateEmployeeId(): string {
-  const suffix = Math.random().toString(36).slice(2, 8);
-  return `EMP${suffix}`;
+  return `EMP${randomBytes(4).toString('hex').toUpperCase()}`;
 }
 
 export function generateUniqueEmployeeName() {
-  const timestamp = Date.now();
+  const uniqueSuffix = randomBytes(4).toString('hex');
 
   return {
-    firstName: `Test${timestamp}`,
-    lastName: 'Employee'
+    firstName: `Test${uniqueSuffix}`,
+    lastName: 'Automation'
   };
 }
