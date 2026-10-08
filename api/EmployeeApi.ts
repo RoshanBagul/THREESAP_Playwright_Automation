@@ -1,49 +1,49 @@
 import { APIRequestContext, expect } from '@playwright/test';
 import { ENVIRONMENT_CONFIG } from '../utils/environment';
 
-export interface ApiEmployee {
-  name: string;
-  job: string;
+export interface OrangeHrmEmployee {
+  empNumber: number;
   employeeId: string;
-  employmentStatus?: string;
+  firstName: string;
+  lastName: string;
+  jobTitle: { title: string | null };
+  empStatus: { name: string | null };
 }
 
 export class EmployeeApi {
-  private readonly baseURL = ENVIRONMENT_CONFIG.employeeApiBaseUrl;
+  private readonly baseURL = `${ENVIRONMENT_CONFIG.orangeHrmBaseUrl}/web/index.php/api/v2/pim/employees`;
 
   constructor(private readonly request: APIRequestContext) {}
 
-  private headers(): Record<string, string> {
-    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-    if (ENVIRONMENT_CONFIG.employeeApiKey) headers['x-api-key'] = ENVIRONMENT_CONFIG.employeeApiKey;
-    return headers;
-  }
+  async getEmployee(employeeNumber: string): Promise<OrangeHrmEmployee> {
+    const response = await this.request.get(`${this.baseURL}/${encodeURIComponent(employeeNumber)}?model=detailed`);
+    expect(response.status(), 'OrangeHRM employee lookup should return HTTP 200').toBe(200);
 
-  async createEmployee(employee: ApiEmployee) {
-    const response = await this.request.post(`${this.baseURL}/api/users`, {
-      headers: this.headers(),
-      timeout: 60000,
-      data: { name: employee.name, job: employee.job, employeeId: employee.employeeId, employmentStatus: employee.employmentStatus }
-    });
-    expect(response.status(), 'Employee API create should return HTTP 201').toBe(201);
-    return response.json();
+    const payload: unknown = await response.json();
+    if (!isEmployeeResponse(payload)) {
+      throw new Error(`OrangeHRM employee lookup returned an unexpected response for employee ${employeeNumber}.`);
+    }
+    return payload.data;
   }
+}
 
-  async updateEmployee(id: string, employee: ApiEmployee) {
-    const response = await this.request.put(`${this.baseURL}/api/users/${id}`, {
-      headers: this.headers(),
-      timeout: 60000,
-      data: { name: employee.name, job: employee.job, employeeId: employee.employeeId, employmentStatus: employee.employmentStatus }
-    });
-    expect(response.status(), 'Employee API update should return HTTP 200').toBe(200);
-    return response.json();
-  }
+function isEmployeeResponse(payload: unknown): payload is { data: OrangeHrmEmployee } {
+  if (!isRecord(payload) || !isRecord(payload.data)) return false;
 
-  async deleteEmployee(id: string) {
-    const response = await this.request.delete(`${this.baseURL}/api/users/${id}`, {
-      headers: this.headers(),
-      timeout: 60000
-    });
-    expect(response.status(), 'Employee API delete should return HTTP 204').toBe(204);
-  }
+  const employee = payload.data;
+  const jobTitle = employee.jobTitle;
+  const empStatus = employee.empStatus;
+
+  return typeof employee.empNumber === 'number'
+    && typeof employee.employeeId === 'string'
+    && typeof employee.firstName === 'string'
+    && typeof employee.lastName === 'string'
+    && isRecord(jobTitle)
+    && (jobTitle.title === null || typeof jobTitle.title === 'string')
+    && isRecord(empStatus)
+    && (empStatus.name === null || typeof empStatus.name === 'string');
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
 }

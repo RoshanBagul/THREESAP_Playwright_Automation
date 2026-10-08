@@ -16,7 +16,7 @@ export class AddEmployeePage extends BasePage {
   private firstName = this.page.getByPlaceholder('First Name');
   private lastName = this.page.getByPlaceholder('Last Name');
 
-  async addEmployee(data: EmployeeInput, imagePath = path.resolve('test-assets/profile.png')) {
+  async addEmployee(data: EmployeeInput, imagePath = path.resolve('test-assets/profile.png')): Promise<string> {
     await this.firstName.fill(data.firstName);
     await this.lastName.fill(data.lastName);
 
@@ -37,5 +37,12 @@ export class AddEmployeePage extends BasePage {
     ]);
 
     await expect(this.page.getByRole('heading', { name: 'Personal Details' })).toBeVisible({ timeout: 15000 });
+
+    const employeeNumber = new URL(this.page.url()).pathname
+      .match(/\/viewPersonalDetails\/empNumber\/(\d+)/)?.[1];
+    if (!employeeNumber) {
+      throw new Error(`Could not determine the OrangeHRM employee number from ${this.page.url()}.`);
+    }
+    return employeeNumber;
   }
 }

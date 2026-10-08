@@ -67,19 +67,19 @@ The runner loads `.env.<TEST_ENV>` first, then `.env` as a shared fallback; vari
 already set in the process take precedence over both files. Create files such as
 `.env.staging` for environment-specific settings. These files are ignored by Git.
 
-The required variables are `ORANGEHRM_BASE_URL`, `ORANGEHRM_USERNAME`,
-`ORANGEHRM_PASSWORD`, and `EMPLOYEE_API_BASE_URL`. To run Admin-versus-ESS role checks,
+The required variables are `ORANGEHRM_BASE_URL`, `ORANGEHRM_USERNAME`, and
+`ORANGEHRM_PASSWORD`. To run Admin-versus-ESS role checks,
 also set `ORANGEHRM_ESS_USERNAME` and `ORANGEHRM_ESS_PASSWORD` to an existing ESS user;
 both must be set together. Those checks verify that ESS can see `My Info` but cannot
 see the `Admin` or `PIM` menus, while Admin sees the administrative menus. Without
 ESS credentials, the Admin menu test still runs and the ESS-specific test is reported
-as skipped. For GitHub Actions, configure the application and API URLs as repository
-variables named `ORANGEHRM_BASE_URL` and `EMPLOYEE_API_BASE_URL` to override the
-workflow defaults (OrangeHRM demo and Reqres). Configure `ORANGEHRM_USERNAME` and
-`ORANGEHRM_PASSWORD` as repository secrets. Optionally configure
+as skipped. GitHub Actions defaults to the public OrangeHRM demo account when
+`ORANGEHRM_USERNAME` and `ORANGEHRM_PASSWORD` secrets are absent. For private or
+staging environments, configure `ORANGEHRM_BASE_URL` as a repository variable and
+set both credentials as repository secrets to override those demo defaults.
+Optionally configure
 `ORANGEHRM_ESS_USERNAME` and `ORANGEHRM_ESS_PASSWORD` as secrets to enable the ESS
-checks. `REQRES_API_KEY` is optional when the configured API requires authentication
-and can be set as a GitHub Actions secret when needed.
+checks.
 
 To run against another local profile, set `TEST_ENV` before invoking Playwright:
 
@@ -142,7 +142,7 @@ The project currently includes these automated checks:
 - Empty username/password validation
 - Employee creation flow
 - Employee record editing
-- API validation for created/updated employee data
+- OrangeHRM PIM API validation of the employee created and updated through the UI
 - Employee deletion
 - Logout flow
 
@@ -176,7 +176,6 @@ If a scenario fails, the relevant failure artifacts (including video) are saved 
 - `tests/login.spec.ts` — login and authentication validations
 - `tests/role-access.spec.ts` — compares Admin and optional ESS navigation visibility
 - `tests/employee-lifecycle.spec.ts` — UI employee add/edit/delete lifecycle workflow
-- `tests/employee-api.spec.ts` — employee API create/update/delete contract (runs once in Chromium to limit external API traffic)
 
 ## Page Objects
 

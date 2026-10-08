@@ -1,9 +1,11 @@
+import { expect } from '@playwright/test';
 import { test } from '../fixtures/employeeCleanup';
 import { DashboardPage } from '../pages/DashboardPage';
 import { PimPage } from '../pages/PimPage';
 import { AddEmployeePage } from '../pages/AddEmployeePage';
 import { EmployeeListPage } from '../pages/EmployeeListPage';
 import { EmployeeDetailsPage } from '../pages/EmployeeDetailsPage';
+import { EmployeeApi } from '../api/EmployeeApi';
 import { generateEmployeeId, generateUniqueEmployeeName } from '../utils/testDataGenerator';
 import employeeData from '../data/employeeData.json';
 
@@ -16,6 +18,7 @@ test.describe('OrangeHRM - Employee Lifecycle', { tag: '@regression' }, () => {
     const addEmployee = new AddEmployeePage(page);
     const employeeList = new EmployeeListPage(page);
     const employeeDetails = new EmployeeDetailsPage(page);
+    const employeeApi = new EmployeeApi(page.context().request);
     const names = generateUniqueEmployeeName();
     const employeeId = generateEmployeeId();
     const jobTitle = employeeData.employee.jobTitle;
@@ -26,7 +29,11 @@ test.describe('OrangeHRM - Employee Lifecycle', { tag: '@regression' }, () => {
     await pim.open();
     await pim.openAddEmployee();
     employeeCleanup.trackUiEmployee(employeeId);
-    await addEmployee.addEmployee({ firstName: names.firstName, lastName: names.lastName, employeeId });
+    const employeeNumber = await addEmployee.addEmployee({
+      firstName: names.firstName,
+      lastName: names.lastName,
+      employeeId
+    });
 
     await pim.openEmployeeList();
     await employeeList.searchByEmployeeId(employeeId);
@@ -38,6 +45,14 @@ test.describe('OrangeHRM - Employee Lifecycle', { tag: '@regression' }, () => {
     await employeeDetails.save();
     await employeeDetails.verifyJobTitle(jobTitle);
     await employeeDetails.verifyEmploymentStatus(employmentStatus);
+
+    const apiEmployee = await employeeApi.getEmployee(employeeNumber);
+    expect(apiEmployee.empNumber).toBe(Number(employeeNumber));
+    expect(apiEmployee.employeeId).toBe(employeeId);
+    expect(apiEmployee.firstName).toBe(names.firstName);
+    expect(apiEmployee.lastName).toBe(names.lastName);
+    expect(apiEmployee.jobTitle.title).toBe(jobTitle);
+    expect(apiEmployee.empStatus.name).toBe(employmentStatus);
 
     await pim.openEmployeeList();
     await employeeList.searchByEmployeeId(employeeId);

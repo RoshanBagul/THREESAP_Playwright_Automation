@@ -1,5 +1,4 @@
 import { test as base } from '@playwright/test';
-import { EmployeeApi } from '../api/EmployeeApi';
 import { DashboardPage } from '../pages/DashboardPage';
 import { EmployeeListPage } from '../pages/EmployeeListPage';
 import { LoginPage } from '../pages/LoginPage';
@@ -8,32 +7,18 @@ import { TEST_CONFIG } from '../utils/constants';
 type EmployeeCleanup = {
   trackUiEmployee: (employeeId: string) => void;
   markUiEmployeeDeleted: (employeeId: string) => void;
-  trackApiEmployee: (employeeId: string) => void;
-  markApiEmployeeDeleted: (employeeId: string) => void;
 };
 
 export const test = base.extend<{ employeeCleanup: EmployeeCleanup }>({
-  employeeCleanup: async ({ page, request }, use) => {
+  employeeCleanup: async ({ page }, use) => {
     const uiEmployeeIds = new Set<string>();
-    const apiEmployeeIds = new Set<string>();
 
     await use({
       trackUiEmployee: (employeeId) => uiEmployeeIds.add(employeeId),
-      markUiEmployeeDeleted: (employeeId) => uiEmployeeIds.delete(employeeId),
-      trackApiEmployee: (employeeId) => apiEmployeeIds.add(employeeId),
-      markApiEmployeeDeleted: (employeeId) => apiEmployeeIds.delete(employeeId)
+      markUiEmployeeDeleted: (employeeId) => uiEmployeeIds.delete(employeeId)
     });
 
     const cleanupErrors: string[] = [];
-    const employeeApi = new EmployeeApi(request);
-
-    for (const employeeId of apiEmployeeIds) {
-      try {
-        await employeeApi.deleteEmployee(employeeId);
-      } catch (error) {
-        cleanupErrors.push(error instanceof Error ? error.message : String(error));
-      }
-    }
 
     if (uiEmployeeIds.size > 0) {
       try {

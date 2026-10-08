@@ -64,6 +64,4 @@ export const ENVIRONMENT_CONFIG = {
   orangeHrmPassword: requiredEnvironmentVariable('ORANGEHRM_PASSWORD'),
   orangeHrmEssUsername,
   orangeHrmEssPassword,
-  employeeApiBaseUrl: requiredUrl('EMPLOYEE_API_BASE_URL'),
-  employeeApiKey: process.env.REQRES_API_KEY
 };
