@@ -15,12 +15,12 @@ jobs:
     env:
       CI: true
       TEST_ENV: staging
-      ORANGEHRM_BASE_URL: ${{ vars.ORANGEHRM_BASE_URL }}
+      ORANGEHRM_BASE_URL: ${{ vars.ORANGEHRM_BASE_URL || 'https://opensource-demo.orangehrmlive.com' }}
       ORANGEHRM_USERNAME: ${{ secrets.ORANGEHRM_USERNAME }}
       ORANGEHRM_PASSWORD: ${{ secrets.ORANGEHRM_PASSWORD }}
       ORANGEHRM_ESS_USERNAME: ${{ secrets.ORANGEHRM_ESS_USERNAME }}
       ORANGEHRM_ESS_PASSWORD: ${{ secrets.ORANGEHRM_ESS_PASSWORD }}
-      EMPLOYEE_API_BASE_URL: ${{ vars.EMPLOYEE_API_BASE_URL }}
+      EMPLOYEE_API_BASE_URL: ${{ vars.EMPLOYEE_API_BASE_URL || 'https://reqres.in' }}
       REQRES_API_KEY: ${{ secrets.REQRES_API_KEY }}
     steps:
       - name: Check out repository

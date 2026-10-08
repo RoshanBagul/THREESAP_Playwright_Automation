@@ -73,12 +73,13 @@ also set `ORANGEHRM_ESS_USERNAME` and `ORANGEHRM_ESS_PASSWORD` to an existing ES
 both must be set together. Those checks verify that ESS can see `My Info` but cannot
 see the `Admin` or `PIM` menus, while Admin sees the administrative menus. Without
 ESS credentials, the Admin menu test still runs and the ESS-specific test is reported
-as skipped. For GitHub Actions, configure the URLs as repository variables named
-`ORANGEHRM_BASE_URL` and `EMPLOYEE_API_BASE_URL`, and configure
-`ORANGEHRM_USERNAME` and `ORANGEHRM_PASSWORD` as repository secrets. Optionally
-configure `ORANGEHRM_ESS_USERNAME` and `ORANGEHRM_ESS_PASSWORD` as secrets to enable
-the ESS checks. `REQRES_API_KEY` is optional when the configured API requires
-authentication and can be set as a GitHub Actions secret when needed.
+as skipped. For GitHub Actions, configure the application and API URLs as repository
+variables named `ORANGEHRM_BASE_URL` and `EMPLOYEE_API_BASE_URL` to override the
+workflow defaults (OrangeHRM demo and Reqres). Configure `ORANGEHRM_USERNAME` and
+`ORANGEHRM_PASSWORD` as repository secrets. Optionally configure
+`ORANGEHRM_ESS_USERNAME` and `ORANGEHRM_ESS_PASSWORD` as secrets to enable the ESS
+checks. `REQRES_API_KEY` is optional when the configured API requires authentication
+and can be set as a GitHub Actions secret when needed.
 
 To run against another local profile, set `TEST_ENV` before invoking Playwright:
 
