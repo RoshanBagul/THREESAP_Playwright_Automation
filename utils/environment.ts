@@ -44,10 +44,26 @@ function requiredUrl(name: string): string {
   return value.replace(/\/+$/, '');
 }
 
+function optionalEnvironmentVariable(name: string): string | undefined {
+  const value = process.env[name]?.trim();
+  return value || undefined;
+}
+
+const orangeHrmEssUsername = optionalEnvironmentVariable('ORANGEHRM_ESS_USERNAME');
+const orangeHrmEssPassword = optionalEnvironmentVariable('ORANGEHRM_ESS_PASSWORD');
+
+if (Boolean(orangeHrmEssUsername) !== Boolean(orangeHrmEssPassword)) {
+  throw new Error(
+    'ORANGEHRM_ESS_USERNAME and ORANGEHRM_ESS_PASSWORD must be set together.'
+  );
+}
+
 export const ENVIRONMENT_CONFIG = {
   orangeHrmBaseUrl: requiredUrl('ORANGEHRM_BASE_URL'),
   orangeHrmUsername: requiredEnvironmentVariable('ORANGEHRM_USERNAME'),
   orangeHrmPassword: requiredEnvironmentVariable('ORANGEHRM_PASSWORD'),
+  orangeHrmEssUsername,
+  orangeHrmEssPassword,
   employeeApiBaseUrl: requiredUrl('EMPLOYEE_API_BASE_URL'),
   employeeApiKey: process.env.REQRES_API_KEY
 };

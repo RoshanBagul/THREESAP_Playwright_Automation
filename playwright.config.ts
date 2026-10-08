@@ -2,7 +2,8 @@ import { defineConfig } from '@playwright/test';
 import path from 'node:path';
 import { ENVIRONMENT_CONFIG } from './utils/environment';
 
-const authFile = path.resolve(__dirname, '.auth/user.json');
+const authFile = (browserName: string, role: 'admin' | 'ess') =>
+    path.resolve(__dirname, `.auth/${browserName}/${role}.json`);
 
 export default defineConfig({
     testDir: './tests',
@@ -42,27 +43,37 @@ export default defineConfig({
 
     projects: [
         {
-            name: 'setup',
+            name: 'setup-chromium',
             testMatch: /auth\.setup\.ts/,
             use: { browserName: 'chromium' }
         },
         {
+            name: 'setup-firefox',
+            testMatch: /auth\.setup\.ts/,
+            use: { browserName: 'firefox' }
+        },
+        {
+            name: 'setup-webkit',
+            testMatch: /auth\.setup\.ts/,
+            use: { browserName: 'webkit' }
+        },
+        {
             name: 'chromium',
-            dependencies: ['setup'],
+            dependencies: ['setup-chromium'],
             testIgnore: /auth\.setup\.ts/,
-            use: { browserName: 'chromium', storageState: authFile }
+            use: { browserName: 'chromium', storageState: authFile('chromium', 'admin') }
         },
         {
             name: 'firefox',
-            dependencies: ['setup'],
+            dependencies: ['setup-firefox'],
             testIgnore: /auth\.setup\.ts/,
-            use: { browserName: 'firefox', storageState: authFile }
+            use: { browserName: 'firefox', storageState: authFile('firefox', 'admin') }
         },
         {
             name: 'webkit',
-            dependencies: ['setup'],
+            dependencies: ['setup-webkit'],
             testIgnore: /auth\.setup\.ts/,
-            use: { browserName: 'webkit', storageState: authFile }
+            use: { browserName: 'webkit', storageState: authFile('webkit', 'admin') }
         }
     ]
 });
