@@ -17,8 +17,8 @@ jobs:
       CI: true
       TEST_ENV: staging
       ORANGEHRM_BASE_URL: ${{ vars.ORANGEHRM_BASE_URL || 'https://opensource-demo.orangehrmlive.com' }}
-      ORANGEHRM_USERNAME: ${{ secrets.ORANGEHRM_USERNAME }}
-      ORANGEHRM_PASSWORD: ${{ secrets.ORANGEHRM_PASSWORD }}
+      ORANGEHRM_USERNAME: ${{ secrets.ORANGEHRM_USERNAME || (vars.ORANGEHRM_BASE_URL == '' && 'Admin' || '') }}
+      ORANGEHRM_PASSWORD: ${{ secrets.ORANGEHRM_PASSWORD || (vars.ORANGEHRM_BASE_URL == '' && 'admin123' || '') }}
       ORANGEHRM_ESS_USERNAME: ${{ secrets.ORANGEHRM_ESS_USERNAME }}
       ORANGEHRM_ESS_PASSWORD: ${{ secrets.ORANGEHRM_ESS_PASSWORD }}
     steps:
