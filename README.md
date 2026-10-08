@@ -75,8 +75,9 @@ see the `Admin` or `PIM` menus, while Admin sees the administrative menus. Witho
 ESS credentials, the Admin menu test still runs and the ESS-specific test is reported
 as skipped. GitHub Actions defaults `ORANGEHRM_BASE_URL` to the public OrangeHRM demo;
 set it as a repository variable to test another environment. Configure
-`ORANGEHRM_USERNAME` and `ORANGEHRM_PASSWORD` as repository secrets. The workflow
-stops with a clear error if either credential is missing.
+`ORANGEHRM_USERNAME` and `ORANGEHRM_PASSWORD` as repository secrets or as secrets in
+the GitHub `staging` Environment used by the workflow. The workflow stops with a
+clear error if either credential is missing.
 Optionally configure
 `ORANGEHRM_ESS_USERNAME` and `ORANGEHRM_ESS_PASSWORD` as secrets to enable the ESS
 checks.

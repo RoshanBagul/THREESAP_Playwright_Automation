@@ -12,6 +12,7 @@ jobs:
   test:
     timeout-minutes: 30
     runs-on: ubuntu-latest
+    environment: staging
     env:
       CI: true
       TEST_ENV: staging
