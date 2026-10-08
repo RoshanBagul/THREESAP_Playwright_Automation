@@ -4,7 +4,7 @@ import { EmployeeListPage } from '../pages/EmployeeListPage';
 import { LoginPage } from '../pages/LoginPage';
 import { TEST_CONFIG } from '../utils/constants';
 
-type EmployeeCleanup = {
+export type EmployeeCleanup = {
   trackUiEmployee: (employeeId: string) => void;
   markUiEmployeeDeleted: (employeeId: string) => void;
 };

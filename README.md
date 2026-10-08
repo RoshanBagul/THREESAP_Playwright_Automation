@@ -73,9 +73,10 @@ also set `ORANGEHRM_ESS_USERNAME` and `ORANGEHRM_ESS_PASSWORD` to an existing ES
 both must be set together. Those checks verify that ESS can see `My Info` but cannot
 see the `Admin` or `PIM` menus, while Admin sees the administrative menus. Without
 ESS credentials, the Admin menu test still runs and the ESS-specific test is reported
-as skipped. For GitHub Actions, configure `ORANGEHRM_BASE_URL` as a repository
-variable and `ORANGEHRM_USERNAME` and `ORANGEHRM_PASSWORD` as repository secrets.
-The workflow stops with a clear error if any of these required values are missing.
+as skipped. GitHub Actions defaults `ORANGEHRM_BASE_URL` to the public OrangeHRM demo;
+set it as a repository variable to test another environment. Configure
+`ORANGEHRM_USERNAME` and `ORANGEHRM_PASSWORD` as repository secrets. The workflow
+stops with a clear error if either credential is missing.
 Optionally configure
 `ORANGEHRM_ESS_USERNAME` and `ORANGEHRM_ESS_PASSWORD` as secrets to enable the ESS
 checks.
@@ -139,25 +140,10 @@ The project currently includes these automated checks:
 - Successful admin login
 - Invalid credentials flow
 - Empty username/password validation
-- Employee creation flow
-- Employee record editing
-- OrangeHRM PIM API validation of the employee created and updated through the UI
-- Employee deletion
-- Logout flow
-
-## Full Suite Execution Summary
-
-The complete Playwright suite was executed successfully in the current workspace:
-
-```powershell
-cmd /c "set PATH=C:\Program Files\nodejs;%PATH% && cd /d D:\Automation\threesap_automation && npx playwright test --project=chromium"
-```
-
-Verified result:
-
-- 10 passed
-- 0 failed
-- total runtime: 58.4s
+- Independent employee creation and list-verification test
+- Independent employee update and OrangeHRM PIM API-verification test
+- Independent employee deletion test
+- Independent logout test
 
 ## Video Recording
 
@@ -174,7 +160,7 @@ If a scenario fails, the relevant failure artifacts (including video) are saved 
 - `tests/auth.setup.ts` — authenticates once and saves browser storage state for reuse
 - `tests/login.spec.ts` — login and authentication validations
 - `tests/role-access.spec.ts` — compares Admin and optional ESS navigation visibility
-- `tests/employee-lifecycle.spec.ts` — UI employee add/edit/delete lifecycle workflow
+- `tests/employee-lifecycle.spec.ts` — independent UI create, update/API verify, delete, and logout cases; employee records are isolated per test and cleaned up
 
 ## Page Objects
 
@@ -195,7 +181,7 @@ The Playwright config uses:
 - Chromium, Firefox, and WebKit projects
 - a setup project that saves authenticated storage state to the ignored `.auth/` directory for reuse across browser projects
 - the login spec uses an empty storage state so authentication scenarios still exercise the login UI
-- shared action, navigation, assertion, and lifecycle timeouts are maintained in `utils/timeouts.json`
+- shared action, navigation, assertion, and per-workflow test timeouts are maintained in `utils/timeouts.json`
 - a fixed 1280x800 viewport across browsers
 - three CI workers so browser projects can run concurrently
 - headed mode enabled in local runs

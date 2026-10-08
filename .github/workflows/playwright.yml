@@ -15,7 +15,7 @@ jobs:
     env:
       CI: true
       TEST_ENV: staging
-      ORANGEHRM_BASE_URL: ${{ vars.ORANGEHRM_BASE_URL }}
+      ORANGEHRM_BASE_URL: ${{ vars.ORANGEHRM_BASE_URL || 'https://opensource-demo.orangehrmlive.com' }}
       ORANGEHRM_USERNAME: ${{ secrets.ORANGEHRM_USERNAME }}
       ORANGEHRM_PASSWORD: ${{ secrets.ORANGEHRM_PASSWORD }}
       ORANGEHRM_ESS_USERNAME: ${{ secrets.ORANGEHRM_ESS_USERNAME }}
@@ -36,13 +36,9 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium firefox webkit
 
-      - name: Validate required configuration
+      - name: Validate required credentials
         shell: bash
         run: |
-          if [ -z "$ORANGEHRM_BASE_URL" ]; then
-            echo "::error::Configure ORANGEHRM_BASE_URL as a GitHub Actions variable."
-            exit 1
-          fi
           if [ -z "$ORANGEHRM_USERNAME" ] || [ -z "$ORANGEHRM_PASSWORD" ]; then
             echo "::error::Configure ORANGEHRM_USERNAME and ORANGEHRM_PASSWORD as GitHub Actions secrets."
             exit 1
