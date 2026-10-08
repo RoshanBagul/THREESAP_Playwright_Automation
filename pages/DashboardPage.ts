@@ -24,7 +24,7 @@ export class DashboardPage extends BasePage {
   }
 
   async logout() {
-    await this.page.goto('/web/index.php/auth/logout');
+    await this.page.goto('/web/index.php/auth/logout', { waitUntil: 'commit' });
     await this.verifyUrl(/\/auth\/login/);
   }
 }

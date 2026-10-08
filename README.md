@@ -160,7 +160,8 @@ If a scenario fails, the relevant failure artifacts (including video) are saved 
 - `tests/auth.setup.ts` — authenticates once and saves browser storage state for reuse
 - `tests/login.spec.ts` — login and authentication validations
 - `tests/role-access.spec.ts` — compares Admin and optional ESS navigation visibility
-- `tests/employee-lifecycle.spec.ts` — independent UI create, update/API verify, delete, and logout cases; employee records are isolated per test and cleaned up
+- `tests/employee-lifecycle.spec.ts` — independent UI create, update/API verify, delete, and logout cases with named Playwright steps
+- `fixtures/employeeCleanup.ts` — tracks test-created employees, logs cleanup failures, and attaches failure details to the Playwright report
 
 ## Page Objects
 

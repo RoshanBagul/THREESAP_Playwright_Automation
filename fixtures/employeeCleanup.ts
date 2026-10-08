@@ -10,7 +10,7 @@ export type EmployeeCleanup = {
 };
 
 export const test = base.extend<{ employeeCleanup: EmployeeCleanup }>({
-  employeeCleanup: async ({ page }, use) => {
+  employeeCleanup: async ({ page }, use, testInfo) => {
     const uiEmployeeIds = new Set<string>();
 
     await use({
@@ -20,7 +20,7 @@ export const test = base.extend<{ employeeCleanup: EmployeeCleanup }>({
 
     const cleanupErrors: string[] = [];
 
-    if (uiEmployeeIds.size > 0) {
+    for (const employeeId of uiEmployeeIds) {
       try {
         await page.goto('/web/index.php/pim/viewEmployeeList');
 
@@ -32,21 +32,26 @@ export const test = base.extend<{ employeeCleanup: EmployeeCleanup }>({
         }
 
         const employeeList = new EmployeeListPage(page);
-        for (const employeeId of uiEmployeeIds) {
-          await employeeList.searchByEmployeeId(employeeId);
-          const employeeRow = page.locator('.oxd-table-row').filter({ hasText: employeeId });
+        await employeeList.searchByEmployeeId(employeeId);
+        const employeeRow = page.locator('.oxd-table-row').filter({ hasText: employeeId });
 
-          if (await employeeRow.count() > 0) {
-            await employeeList.deleteEmployee(employeeId);
-            await employeeList.verifyEmployeeDeleted(employeeId);
-          }
+        if (await employeeRow.count() > 0) {
+          await employeeList.deleteEmployee(employeeId);
+          await employeeList.verifyEmployeeDeleted(employeeId);
         }
       } catch (error) {
-        cleanupErrors.push(error instanceof Error ? error.message : String(error));
+        const message = error instanceof Error ? error.message : String(error);
+        const cleanupError = `Employee ${employeeId}: ${message}`;
+        cleanupErrors.push(cleanupError);
+        console.error(`[employeeCleanup] ${cleanupError}`);
       }
     }
 
     if (cleanupErrors.length > 0) {
+      await testInfo.attach('employee-cleanup-errors.txt', {
+        body: cleanupErrors.join('\n'),
+        contentType: 'text/plain'
+      });
       throw new Error(`Employee fixture cleanup failed: ${cleanupErrors.join('; ')}`);
     }
   }

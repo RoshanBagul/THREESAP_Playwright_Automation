@@ -36,61 +36,77 @@ test.describe('OrangeHRM - Employee Lifecycle', { tag: '@regression' }, () => {
   test.describe.configure({ timeout: TIMEOUTS.employeeWorkflowTest });
 
   test('should create an employee and find it in the employee list', async ({ page, employeeCleanup }) => {
-    const { employeeId } = await createEmployee(page, employeeCleanup.trackUiEmployee);
-    const pim = new PimPage(page);
-    const employeeList = new EmployeeListPage(page);
+    const { employeeId } = await test.step('Create an employee', () =>
+      createEmployee(page, employeeCleanup.trackUiEmployee));
 
-    await pim.openEmployeeList();
-    await employeeList.searchByEmployeeId(employeeId);
-    await employeeList.verifyEmployeeVisible(employeeId);
+    await test.step('Verify the employee appears in the employee list', async () => {
+      const pim = new PimPage(page);
+      const employeeList = new EmployeeListPage(page);
+
+      await pim.openEmployeeList();
+      await employeeList.searchByEmployeeId(employeeId);
+      await employeeList.verifyEmployeeVisible(employeeId);
+    });
   });
 
   test('should update employee details and verify them through the PIM API', async ({ page, employeeCleanup }) => {
     const { names, employeeId, employeeNumber } =
-      await createEmployee(page, employeeCleanup.trackUiEmployee);
-    const pim = new PimPage(page);
-    const employeeList = new EmployeeListPage(page);
-    const employeeDetails = new EmployeeDetailsPage(page);
-    const employeeApi = new EmployeeApi(page.context().request);
+      await test.step('Create an employee for update verification', () =>
+        createEmployee(page, employeeCleanup.trackUiEmployee));
     const jobTitle = employeeData.employee.jobTitle;
     const employmentStatus = employeeData.employee.employmentStatus;
 
-    await pim.openEmployeeList();
-    await employeeList.searchByEmployeeId(employeeId);
-    await employeeList.openEmployee(employeeId);
-    await employeeDetails.updateJobTitle(jobTitle);
-    await employeeDetails.updateEmploymentStatus(employmentStatus);
-    await employeeDetails.save();
-    await employeeDetails.verifyJobTitle(jobTitle);
-    await employeeDetails.verifyEmploymentStatus(employmentStatus);
+    await test.step('Update job title and employment status in the UI', async () => {
+      const pim = new PimPage(page);
+      const employeeList = new EmployeeListPage(page);
+      const employeeDetails = new EmployeeDetailsPage(page);
 
-    const apiEmployee = await employeeApi.getEmployee(employeeNumber);
-    expect(apiEmployee.empNumber).toBe(Number(employeeNumber));
-    expect(apiEmployee.employeeId).toBe(employeeId);
-    expect(apiEmployee.firstName).toBe(names.firstName);
-    expect(apiEmployee.lastName).toBe(names.lastName);
-    expect(apiEmployee.jobTitle.title).toBe(jobTitle);
-    expect(apiEmployee.empStatus.name).toBe(employmentStatus);
+      await pim.openEmployeeList();
+      await employeeList.searchByEmployeeId(employeeId);
+      await employeeList.openEmployee(employeeId);
+      await employeeDetails.updateJobTitle(jobTitle);
+      await employeeDetails.updateEmploymentStatus(employmentStatus);
+      await employeeDetails.save();
+      await employeeDetails.verifyJobTitle(jobTitle);
+      await employeeDetails.verifyEmploymentStatus(employmentStatus);
+    });
+
+    await test.step('Verify saved employee data through the OrangeHRM PIM API', async () => {
+      const employeeApi = new EmployeeApi(page.context().request);
+      const apiEmployee = await employeeApi.getEmployee(employeeNumber);
+      expect(apiEmployee.empNumber).toBe(Number(employeeNumber));
+      expect(apiEmployee.employeeId).toBe(employeeId);
+      expect(apiEmployee.firstName).toBe(names.firstName);
+      expect(apiEmployee.lastName).toBe(names.lastName);
+      expect(apiEmployee.jobTitle.title).toBe(jobTitle);
+      expect(apiEmployee.empStatus.name).toBe(employmentStatus);
+    });
   });
 
   test('should delete an employee from the employee list', async ({ page, employeeCleanup }) => {
-    const { employeeId } = await createEmployee(page, employeeCleanup.trackUiEmployee);
-    const pim = new PimPage(page);
-    const employeeList = new EmployeeListPage(page);
+    const { employeeId } = await test.step('Create an employee for deletion', () =>
+      createEmployee(page, employeeCleanup.trackUiEmployee));
 
-    await pim.openEmployeeList();
-    await employeeList.searchByEmployeeId(employeeId);
-    await employeeList.deleteEmployee(employeeId);
-    await employeeList.verifyEmployeeDeleted(employeeId);
-    employeeCleanup.markUiEmployeeDeleted(employeeId);
+    await test.step('Delete the employee and verify it is removed', async () => {
+      const pim = new PimPage(page);
+      const employeeList = new EmployeeListPage(page);
+
+      await pim.openEmployeeList();
+      await employeeList.searchByEmployeeId(employeeId);
+      await employeeList.deleteEmployee(employeeId);
+      await employeeList.verifyEmployeeDeleted(employeeId);
+      employeeCleanup.markUiEmployeeDeleted(employeeId);
+    });
   });
 
   test('should log out and return to the login form', async ({ page }) => {
     const dashboard = new DashboardPage(page);
     const loginPage = new LoginPage(page);
 
-    await dashboard.open();
-    await dashboard.logout();
-    await loginPage.verifyLoginFormVisible();
+    await test.step('Open the authenticated dashboard', () => dashboard.open());
+    await test.step('Log out and verify the login form', async () => {
+      await dashboard.logout();
+      await loginPage.verifyLoginFormVisible();
+    });
   });
 });
