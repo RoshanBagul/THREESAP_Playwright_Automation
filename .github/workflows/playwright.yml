@@ -31,15 +31,27 @@ jobs:
         run: npx playwright install --with-deps chromium firefox webkit
 
       - name: Run Playwright tests
-        run: npm test
+        run: npm run test:allure
 
-      - name: Upload Playwright reports
+      - name: Generate Allure HTML report
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          if [ -n "$(find allure-results -type f -print -quit 2>/dev/null)" ]; then
+            npm run allure:report
+          else
+            echo "No Allure results were generated."
+          fi
+
+      - name: Upload test reports
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report
+          name: test-reports
           path: |
             playwright-report/
             test-results/
+            allure-results/
+            allure-report/
           if-no-files-found: ignore
           retention-days: 14

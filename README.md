@@ -164,6 +164,16 @@ The Playwright config uses:
 
 ## Reports
 
+Generate and open the Allure HTML report locally:
+
+```bash
+npm run test:allure
+npm run allure:report
+npm run allure:open
+```
+
+GitHub Actions generates the Allure report after the test step and uploads it with the Playwright report and test results, including when tests fail.
+
 HTML reports are generated in:
 
 ```text
