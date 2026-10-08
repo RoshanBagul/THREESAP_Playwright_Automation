@@ -1,5 +1,6 @@
-import { Page, expect } from '@playwright/test';
+import { expect, Page } from '@playwright/test';
 import path from 'path';
+import { BasePage } from './BasePage';
 
 export interface EmployeeInput {
   firstName: string;
@@ -7,8 +8,10 @@ export interface EmployeeInput {
   employeeId: string;
 }
 
-export class AddEmployeePage {
-  constructor(private readonly page: Page) {}
+export class AddEmployeePage extends BasePage {
+  constructor(page: Page) {
+    super(page);
+  }
 
   private firstName = this.page.getByPlaceholder('First Name');
   private lastName = this.page.getByPlaceholder('Last Name');

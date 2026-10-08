@@ -1,18 +1,16 @@
-import { Page, Locator, expect } from '@playwright/test';
+import { expect, Locator, Page } from '@playwright/test';
+import { BasePage } from './BasePage';
 
-export class LoginPage {
-  readonly page: Page;
-
-  readonly usernameInput: Locator;
-  readonly passwordInput: Locator;
-  readonly loginButton: Locator;
+export class LoginPage extends BasePage {
+  private readonly usernameInput: Locator;
+  private readonly passwordInput: Locator;
+  private readonly loginButton: Locator;
 
   constructor(page: Page) {
-    this.page = page;
-
-    this.usernameInput = page.getByPlaceholder('Username');
-    this.passwordInput = page.getByPlaceholder('Password');
-    this.loginButton = page.getByRole('button', {
+    super(page);
+    this.usernameInput = this.page.getByPlaceholder('Username');
+    this.passwordInput = this.page.getByPlaceholder('Password');
+    this.loginButton = this.page.getByRole('button', {
       name: 'Login'
     });
   }
@@ -27,13 +25,23 @@ export class LoginPage {
     await this.loginButton.click();
   }
 
-  async verifySuccessfulLogin() {
-    await expect(
-      this.page.getByRole('heading', {
-        name: 'Dashboard'
-      })
-    ).toBeVisible({
-      timeout: 15000
-    });
+  async verifyInvalidCredentials() {
+    await expect(this.page.getByText('Invalid credentials', { exact: false }))
+      .toBeVisible({ timeout: 15000 });
+  }
+
+  async verifyRequiredFieldCount(count: number) {
+    await expect(this.page.getByText('Required', { exact: false }))
+      .toHaveCount(count, { timeout: 15000 });
+  }
+
+  async verifyLoginFormVisible() {
+    await expect(this.usernameInput).toBeVisible();
+    await expect(this.passwordInput).toBeVisible();
+    await expect(this.loginButton).toBeVisible();
+  }
+
+  async verifyPasswordIsMasked() {
+    await expect(this.passwordInput).toHaveAttribute('type', 'password');
   }
 }

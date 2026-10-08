@@ -1,7 +1,10 @@
 import { Page, expect } from '@playwright/test';
+import { BasePage } from './BasePage';
 
-export class EmployeeListPage {
-  constructor(private readonly page: Page) {}
+export class EmployeeListPage extends BasePage {
+  constructor(page: Page) {
+    super(page);
+  }
 
   private employeeIdFilter = this.page
     .locator('.oxd-input-group')
@@ -35,7 +38,7 @@ export class EmployeeListPage {
 
   async openEmployee(employeeId: string) {
     await this.page.getByText(employeeId, { exact: true }).click();
-    await expect(this.page).toHaveURL(/\/pim\/viewPersonalDetails\//);
+    await this.verifyUrl(/\/pim\/viewPersonalDetails\//);
   }
 
   async deleteEmployee(employeeId: string) {

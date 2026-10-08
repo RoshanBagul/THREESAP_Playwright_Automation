@@ -17,6 +17,8 @@ The suite is built with:
 ```text
 threesap_automation/
 ├── api/
+├── pages/
+│   └── BasePage.ts
 ├── data/
 ├── fixtures/
 ├── pages/

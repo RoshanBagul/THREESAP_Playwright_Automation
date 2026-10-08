@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 
 import { LoginPage } from '../pages/LoginPage';
 import { DashboardPage } from '../pages/DashboardPage';
@@ -26,9 +26,7 @@ test.describe('OrangeHRM Login', { tag: '@regression' }, () => {
         await loginPage.navigate();
         await loginPage.login('WrongUser', 'WrongPassword');
 
-        await expect(
-            page.getByText('Invalid credentials', { exact: false })
-        ).toBeVisible({ timeout: 15000 });
+        await loginPage.verifyInvalidCredentials();
     });
 
     test('should show validation when username is empty', async ({ page }) => {
@@ -37,7 +35,7 @@ test.describe('OrangeHRM Login', { tag: '@regression' }, () => {
         await loginPage.navigate();
         await loginPage.login('', TEST_CONFIG.password);
 
-        await expect(page.getByText('Required', { exact: false })).toHaveCount(1, { timeout: 15000 });
+        await loginPage.verifyRequiredFieldCount(1);
     });
 
     test('should show validation when password is empty', async ({ page }) => {
@@ -46,7 +44,7 @@ test.describe('OrangeHRM Login', { tag: '@regression' }, () => {
         await loginPage.navigate();
         await loginPage.login(TEST_CONFIG.username, '');
 
-        await expect(page.getByText('Required', { exact: false })).toHaveCount(1, { timeout: 15000 });
+        await loginPage.verifyRequiredFieldCount(1);
     });
 
     test('should show invalid credentials for invalid username', async ({ page }) => {
@@ -55,9 +53,7 @@ test.describe('OrangeHRM Login', { tag: '@regression' }, () => {
         await loginPage.navigate();
         await loginPage.login('InvalidUser', TEST_CONFIG.password);
 
-        await expect(
-            page.getByText('Invalid credentials', { exact: false })
-        ).toBeVisible({ timeout: 15000 });
+        await loginPage.verifyInvalidCredentials();
     });
 
     test('should show invalid credentials for invalid password', async ({ page }) => {
@@ -66,9 +62,7 @@ test.describe('OrangeHRM Login', { tag: '@regression' }, () => {
         await loginPage.navigate();
         await loginPage.login(TEST_CONFIG.username, 'WrongPassword');
 
-        await expect(
-            page.getByText('Invalid credentials', { exact: false })
-        ).toBeVisible({ timeout: 15000 });
+        await loginPage.verifyInvalidCredentials();
     });
 
     test('should keep user on login page after failed login', async ({ page }) => {
@@ -77,16 +71,14 @@ test.describe('OrangeHRM Login', { tag: '@regression' }, () => {
         await loginPage.navigate();
         await loginPage.login('WrongUser', 'WrongPassword');
 
-        await expect(loginPage.usernameInput).toBeVisible();
-        await expect(loginPage.passwordInput).toBeVisible();
-        await expect(loginPage.loginButton).toBeVisible();
+        await loginPage.verifyLoginFormVisible();
     });
 
     test('should mask password input as a password field', async ({ page }) => {
         const loginPage = new LoginPage(page);
 
         await loginPage.navigate();
-        await expect(loginPage.passwordInput).toHaveAttribute('type', 'password');
+        await loginPage.verifyPasswordIsMasked();
     });
 
     test('should require username and password fields when empty', async ({ page }) => {
@@ -95,7 +87,7 @@ test.describe('OrangeHRM Login', { tag: '@regression' }, () => {
         await loginPage.navigate();
         await loginPage.login('', '');
 
-        await expect(page.getByText('Required', { exact: false })).toHaveCount(2, { timeout: 15000 });
+        await loginPage.verifyRequiredFieldCount(2);
     });
 
 });

@@ -1,13 +1,12 @@
-import { Page, Locator, expect } from '@playwright/test';
+import { expect, Locator, Page } from '@playwright/test';
+import { BasePage } from './BasePage';
 
-export class DashboardPage {
-  readonly page: Page;
-  readonly dashboardHeading: Locator;
+export class DashboardPage extends BasePage {
+  private readonly dashboardHeading: Locator;
 
   constructor(page: Page) {
-    this.page = page;
-
-    this.dashboardHeading = page.getByRole('heading', {
+    super(page);
+    this.dashboardHeading = this.page.getByRole('heading', {
       name: 'Dashboard'
     });
   }
@@ -21,6 +20,6 @@ export class DashboardPage {
 
   async logout() {
     await this.page.goto('/web/index.php/auth/logout');
-    await expect(this.page).toHaveURL(/\/auth\/login/);
+    await this.verifyUrl(/\/auth\/login/);
   }
 }

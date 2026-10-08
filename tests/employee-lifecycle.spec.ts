@@ -81,6 +81,5 @@ test.describe('OrangeHRM - Employee Lifecycle', { tag: '@regression' }, () => {
     employeeCleanup.markApiEmployeeDeleted(String(apiCreated.id));
 
     await dashboard.logout();
-    await expect(page).toHaveURL(/\/auth\/login/);
   });
 });

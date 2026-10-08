@@ -1,20 +1,23 @@
-import { Page, expect } from '@playwright/test';
+import { Page } from '@playwright/test';
+import { BasePage } from './BasePage';
 
-export class PimPage {
-  constructor(private readonly page: Page) {}
+export class PimPage extends BasePage {
+  constructor(page: Page) {
+    super(page);
+  }
 
   async open() {
     await this.page.goto('/web/index.php/pim/viewEmployeeList');
-    await expect(this.page).toHaveURL(/\/pim\//);
+    await this.verifyUrl(/\/pim\//);
   }
 
   async openAddEmployee() {
     await this.page.goto('/web/index.php/pim/addEmployee');
-    await expect(this.page).toHaveURL(/\/pim\/addEmployee/);
+    await this.verifyUrl(/\/pim\/addEmployee/);
   }
 
   async openEmployeeList() {
     await this.page.goto('/web/index.php/pim/viewEmployeeList');
-    await expect(this.page).toHaveURL(/\/pim\/viewEmployeeList/);
+    await this.verifyUrl(/\/pim\/viewEmployeeList/);
   }
 }
