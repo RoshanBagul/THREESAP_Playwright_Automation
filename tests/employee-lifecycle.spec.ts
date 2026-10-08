@@ -11,7 +11,7 @@ import { LoginPage } from '../pages/LoginPage';
 import employeeData from '../data/employeeData.json';
 import TIMEOUTS from '../utils/timeouts.json';
 
-async function createEmployee(page: Page, trackEmployee: EmployeeCleanup['trackUiEmployee']) {
+async function createEmployee(page: Page, trackEmployee: EmployeeCleanup['trackEmployee']) {
   const dashboard = new DashboardPage(page);
   const pim = new PimPage(page);
   const addEmployee = new AddEmployeePage(page);
@@ -32,12 +32,29 @@ async function createEmployee(page: Page, trackEmployee: EmployeeCleanup['trackU
   return { names, employeeId, employeeNumber };
 }
 
+async function createEmployeeThroughApi(
+  page: Page,
+  trackEmployee: EmployeeCleanup['trackEmployee']
+) {
+  const names = generateUniqueEmployeeName();
+  const employeeId = generateEmployeeId();
+  trackEmployee(employeeId);
+
+  const employeeNumber = await new EmployeeApi(page.context().request).createEmployee({
+    firstName: names.firstName,
+    lastName: names.lastName,
+    employeeId
+  });
+
+  return { names, employeeId, employeeNumber };
+}
+
 test.describe('OrangeHRM - Employee Lifecycle', { tag: '@regression' }, () => {
   test.describe.configure({ timeout: TIMEOUTS.employeeWorkflowTest });
 
   test('should create an employee and find it in the employee list', { tag: ['@e2e', '@smoke'] }, async ({ page, employeeCleanup }) => {
     const { employeeId } = await test.step('Create an employee', () =>
-      createEmployee(page, employeeCleanup.trackUiEmployee));
+      createEmployee(page, employeeCleanup.trackEmployee));
 
     await test.step('Verify the employee appears in the employee list', async () => {
       const pim = new PimPage(page);
@@ -51,8 +68,8 @@ test.describe('OrangeHRM - Employee Lifecycle', { tag: '@regression' }, () => {
 
   test('should update employee details and verify them through the PIM API', { tag: ['@e2e', '@api'] }, async ({ page, employeeCleanup }) => {
     const { names, employeeId, employeeNumber } =
-      await test.step('Create an employee for update verification', () =>
-        createEmployee(page, employeeCleanup.trackUiEmployee));
+      await test.step('Create an employee through the OrangeHRM API', () =>
+        createEmployeeThroughApi(page, employeeCleanup.trackEmployee));
     const jobTitle = employeeData.employee.jobTitle;
     const employmentStatus = employeeData.employee.employmentStatus;
 
@@ -83,9 +100,9 @@ test.describe('OrangeHRM - Employee Lifecycle', { tag: '@regression' }, () => {
     });
   });
 
-  test('should delete an employee from the employee list', { tag: '@e2e' }, async ({ page, employeeCleanup }) => {
-    const { employeeId } = await test.step('Create an employee for deletion', () =>
-      createEmployee(page, employeeCleanup.trackUiEmployee));
+  test('should delete an employee from the employee list', { tag: ['@e2e', '@api'] }, async ({ page, employeeCleanup }) => {
+    const { employeeId } = await test.step('Create an employee through the OrangeHRM API', () =>
+      createEmployeeThroughApi(page, employeeCleanup.trackEmployee));
 
     await test.step('Delete the employee and verify it is removed', async () => {
       const pim = new PimPage(page);
@@ -95,7 +112,7 @@ test.describe('OrangeHRM - Employee Lifecycle', { tag: '@regression' }, () => {
       await employeeList.searchByEmployeeId(employeeId);
       await employeeList.deleteEmployee(employeeId);
       await employeeList.verifyEmployeeDeleted(employeeId);
-      employeeCleanup.markUiEmployeeDeleted(employeeId);
+      employeeCleanup.markEmployeeDeleted(employeeId);
     });
   });
 

@@ -1,41 +1,58 @@
-# Test Cases for OrangeHRM Login Flow
+# OrangeHRM Automated Test Cases
 
-## Scope
-This document covers the login functionality currently implemented in the project and the most relevant validation scenarios for the OrangeHRM application.
+This matrix documents the automated behavior currently covered by Playwright. Tests
+run against the environment selected through `TEST_ENV` and its corresponding
+`ORANGEHRM_BASE_URL` and credentials. See [README.md](README.md#environment-configuration)
+for setup instructions.
 
-## Functional Area
-- Authentication
-- Dashboard access validation
-- Error validation for invalid login attempts
+## Authentication
 
-## Test Cases
+Login tests use an empty browser storage state and submit credentials through the UI.
+Tests requiring a valid account use the Admin credentials for the selected environment.
 
-| TC ID | Test Case | Preconditions | Steps | Expected Result |
-|------|-----------|---------------|-------|-----------------|
-| TC-01 | Verify login page loads successfully | User is on the application base URL | 1. Open the login page 2. Observe the page | Login form is displayed with username, password, and login button |
-| TC-02 | Verify valid admin login | User has valid credentials configured for the selected environment | 1. Enter valid username 2. Enter valid password 3. Click Login | User is redirected to the Dashboard and dashboard heading is visible |
-| TC-03 | Verify empty username field | User is on login page | 1. Leave username empty 2. Enter a valid password 3. Click Login | Login should not proceed and validation message or field error should be shown |
-| TC-04 | Verify empty password field | User is on login page | 1. Enter valid username 2. Leave password empty 3. Click Login | Login should not proceed and validation message or field error should be shown |
-| TC-05 | Verify both fields empty | User is on login page | 1. Leave username empty 2. Leave password empty 3. Click Login | Login should not proceed and validation messages should be displayed |
-| TC-06 | Verify invalid username | User is on login page | 1. Enter invalid username 2. Enter valid password 3. Click Login | User should not be logged in and an invalid credentials message should be displayed |
-| TC-07 | Verify invalid password | User is on login page | 1. Enter valid username 2. Enter invalid password 3. Click Login | User should not be logged in and an invalid credentials message should be displayed |
-| TC-08 | Verify wrong username and wrong password | User is on login page | 1. Enter incorrect username 2. Enter incorrect password 3. Click Login | Login should fail and user stays on the login page |
-| TC-09 | Verify dashboard visibility after successful login | User has valid credentials | 1. Login successfully 2. Observe next page | Dashboard heading is visible and user is authenticated |
-| TC-10 | Verify login page remains accessible after failed login | User is on login page and credentials are invalid | 1. Enter invalid credentials 2. Submit form | User remains on the login page with an error message |
-| TC-11 | Verify password field masking | User is on login page | 1. Enter password 2. Observe field behavior | Password is entered as masked/secure text |
-| TC-12 | Verify browser maximization does not affect login behavior | Browser is open in headed mode and maximized | 1. Launch the browser 2. Navigate to login page 3. Log in successfully | Login still works normally in the maximized window |
+| ID | Automated scenario | Steps | Expected result |
+|---|---|---|---|
+| AUTH-01 | Valid Admin login | Open login page; submit configured username and password | Dashboard verification succeeds |
+| AUTH-02 | Invalid username and password | Submit an invalid username and password | Invalid-credentials message is shown |
+| AUTH-03 | Empty username | Leave username blank; submit configured password | One required-field message is shown |
+| AUTH-04 | Empty password | Submit configured username; leave password blank | One required-field message is shown |
+| AUTH-05 | Invalid username | Submit an invalid username and configured password | Invalid-credentials message is shown |
+| AUTH-06 | Invalid password | Submit configured username and an invalid password | Invalid-credentials message is shown |
+| AUTH-07 | Remain on login after failed authentication | Submit invalid credentials | Login form remains visible |
+| AUTH-08 | Password masking | Inspect password input on login page | Password input has password type |
+| AUTH-09 | Both fields empty | Submit the login form with both fields blank | Two required-field messages are shown |
 
-## Automation Notes
-The current project already validates the main happy path in:
-- `tests/login.spec.ts`
+## Role-Based Navigation
 
-Relevant Page Objects:
-- `pages/LoginPage.ts`
-- `pages/DashboardPage.ts`
+| ID | Automated scenario | Preconditions | Steps | Expected result |
+|---|---|---|---|---|
+| ROLE-01 | Admin navigation | Admin authentication setup succeeded | Open dashboard; inspect navigation | `Admin` and `PIM` menus are visible |
+| ROLE-02 | ESS navigation restrictions | ESS credentials and browser-specific ESS storage state are configured | Open dashboard as ESS; inspect navigation | `My Info` is visible; `Admin` and `PIM` are hidden |
 
-## Recommended Next Automation Coverage
-1. Invalid credentials test
-2. Empty username/password validation
-3. Logout validation
-4. Dashboard page heading assertion
-5. Browser window maximize verification across runs
+ROLE-02 is skipped when ESS credentials are not configured. Configure both
+`ORANGEHRM_ESS_USERNAME` and `ORANGEHRM_ESS_PASSWORD` together.
+
+## Employee Lifecycle
+
+| ID | Automated scenario | Test data setup | Steps | Expected result |
+|---|---|---|---|---|
+| EMP-01 | Create and find employee | Generate unique data; create through UI | Search employee list by generated Employee ID | Created employee is visible |
+| EMP-02 | Update employee and verify via API | Generate unique data; create through authenticated OrangeHRM PIM API | Update job title and employment status in UI; read employee through PIM API | UI and API show the requested values on the same employee |
+| EMP-03 | Delete employee | Generate unique data; create through authenticated OrangeHRM PIM API | Find and delete employee through UI | Employee no longer appears in the list |
+| EMP-04 | Logout | Use authenticated Admin browser state | Log out from dashboard | Login form is visible |
+
+Created employee records are registered with the cleanup fixture. The fixture deletes
+remaining records during teardown, including after a test failure. Cleanup failures
+fail the test and are logged and attached to the Playwright report.
+
+## Execution and Reports
+
+The suite runs in Chromium, Firefox, and WebKit by default. Use
+`npm run test:cross-browser` to explicitly run those browser projects. The `@api`
+tag selects lifecycle tests that use the
+OrangeHRM API for setup or verification; those tests also exercise the UI.
+
+Playwright HTML reports and per-test results are generated under `playwright-report/`
+and `test-results/`. Allure raw results and the generated Allure report are under
+`allure-results/` and `allure-report/`. These generated directories are gitignored.
+GitHub Actions uploads them in the `test-reports` artifact for 14 days.

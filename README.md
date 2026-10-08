@@ -1,6 +1,6 @@
 # THREESAP Playwright Automation
 
-This project automates OrangeHRM scenarios using Playwright and TypeScript with a Page Object Model (POM). It covers authentication, employee lifecycle workflows, and validation checks against the live OrangeHRM demo environment.
+This project automates OrangeHRM scenarios using Playwright and TypeScript with a Page Object Model (POM). It covers authentication, role-based navigation, and employee lifecycle workflows against the environment selected at runtime.
 
 ## Overview
 
@@ -31,12 +31,29 @@ threesap_automation/
 ├── README.md
 ├── TEST_CASES.md
 ├── .env.example
-├── playwright-report/
-├── test-results/
-├── test-assets/
-├── node_modules/
 └── .gitignore
 ```
+
+Playwright reports, test results, authentication state, and installed dependencies
+are generated locally or by CI; they are not source files and are not committed.
+See [Reports](#reports) for where to find them.
+
+## Key Design Decisions
+
+- **Environment is explicit:** the selected `TEST_ENV` profile supplies the OrangeHRM
+  URL and credentials; tests do not embed environment URLs or secrets. CI configures
+  its own staging profile.
+- **UI tests verify user-visible behavior:** login and the employee creation flow
+  remain browser-driven. The lifecycle update and delete tests use the authenticated
+  OrangeHRM PIM API to seed employees, then perform the behavior under test in the UI.
+- **API checks verify the same record:** the update test reads the employee it changed
+  from OrangeHRM's PIM API rather than relying on a separate mock service.
+- **Test data is isolated and cleaned up:** employee IDs and names are generated per
+  test, and a fixture removes tracked employees even when a test fails.
+- **Browser authentication is reused safely:** setup creates browser-specific storage
+  state; login tests deliberately start unauthenticated.
+- **Generated artifacts stay out of source control:** reports and failure evidence
+  are ignored locally and uploaded as CI artifacts for inspection.
 
 ## Prerequisites
 
@@ -95,15 +112,6 @@ $env:TEST_ENV = "qa"
 npm test
 ```
 
-On Windows, if `npm` is not recognized in PowerShell, first add Node to PATH or call it explicitly:
-
-```powershell
-$env:PATH = "C:\Program Files\nodejs;$env:PATH"
-cd "D:\Automation\threesap_automation"
-npm install
-npx playwright install chromium firefox webkit
-```
-
 ## Run Tests
 
 Run the default suite:
@@ -122,20 +130,27 @@ npm run test:api
 ```
 
 Tests carry `@regression` at suite level; focused happy-path tests are additionally
-tagged `@smoke`, browser-driven workflow cases use `@e2e`, and the lifecycle test
-that validates the updated employee through OrangeHRM's PIM endpoint also uses
-`@api`. Tags can be combined with Playwright's `--grep` / `--grep-invert` options.
+tagged `@smoke`, browser-driven workflow cases use `@e2e`, and lifecycle tests that
+use OrangeHRM's PIM API for employee setup or verification also use `@api`. Tags
+can be combined with Playwright's `--grep` / `--grep-invert` options. `test:api`
+selects tests that use the API; those lifecycle tests also exercise the UI and are
+not API-only tests.
 
 ## Test Data Management
 
 - Employee records are generated per test with cryptographically random identifiers
-  and names, so independent tests and parallel workers do not reuse employee data.
+  and distinct first/last names, so independent tests and parallel workers do not
+  reuse employee data.
 - Shared selectable employee values (job title and employment status) live in
   `data/employeeData.json`; assertions compare against those values instead of
   duplicating them in test code.
 - Tests that create employees register the employee ID with the cleanup fixture
   immediately. Fixture teardown deletes remaining records even when a later test
   step fails; cleanup failures are logged and attached to the Playwright report.
+- The employee create-and-find scenario creates its record through the UI. Update
+  and delete scenarios seed their records through OrangeHRM's PIM API, then exercise
+  the target action through the UI. This keeps test setup separate from the behavior
+  under test while using the selected environment's authenticated session.
 - Keep credentials and environment-specific URLs in `.env.<TEST_ENV>` or CI
   variables/secrets. Do not store account credentials or generated test records in
   committed fixtures.
@@ -171,13 +186,11 @@ npx playwright test tests/employee-lifecycle.spec.ts --project=webkit
 
 The project currently includes these automated checks:
 
-- Login page loads
-- Successful admin login
-- Invalid credentials flow
-- Empty username/password validation
-- Independent employee creation and list-verification test
-- Independent employee update and OrangeHRM PIM API-verification test
-- Independent employee deletion test
+- Successful login, invalid-credential handling, required-field validation, and
+  password masking
+- Admin and optional ESS navigation access
+- Independent employee creation/list verification, update/API verification, and
+  deletion tests
 - Independent logout test
 
 ## Video Recording
@@ -192,7 +205,8 @@ If a scenario fails, the relevant failure artifacts (including video) are saved 
 
 ## Main Test Files
 
-- `tests/auth.setup.ts` — authenticates once and saves browser storage state for reuse
+- `tests/auth.setup.ts` — authenticates in browser-specific setup projects and saves
+  storage state for reuse
 - `tests/login.spec.ts` — login and authentication validations
 - `tests/role-access.spec.ts` — compares Admin and optional ESS navigation visibility
 - `tests/employee-lifecycle.spec.ts` — independent UI create, update/API verify, delete, and logout cases with named Playwright steps
@@ -261,21 +275,23 @@ npm run allure:report
 npm run allure:open
 ```
 
-GitHub Actions generates the Allure report after the test step and uploads it with the Playwright report and test results, including when tests fail.
+GitHub Actions generates the Allure report after the test step and uploads it with
+the Playwright report and test results, including when tests fail. Download the
+`test-reports` artifact from the workflow run; CI retains it for 14 days.
 
-HTML reports are generated in:
+Locally, generated report directories are ignored by Git and appear after the
+corresponding commands run:
 
 ```text
-playwright-report/
+playwright-report/  # Playwright HTML report
+test-results/       # per-test results and failure evidence
+allure-results/     # Allure raw results
+allure-report/      # generated Allure HTML report
 ```
 
-## Verified Test Result
-
-The project has been validated successfully with the full suite and the employee lifecycle spec. The latest verified run includes:
-
-- 10 tests passed in the full suite
-- 1 employee lifecycle scenario passed
+Test coverage and expected behavior are maintained in [TEST_CASES.md](TEST_CASES.md).
 
 ## Additional Documentation
 
-- `TEST_CASES.md` contains the functional test case matrix for the login and employee workflows
+- `TEST_CASES.md` contains the functional test case matrix for authentication,
+  role-based navigation, and employee lifecycle workflows.

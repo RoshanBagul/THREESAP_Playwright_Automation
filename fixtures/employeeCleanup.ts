@@ -5,22 +5,22 @@ import { LoginPage } from '../pages/LoginPage';
 import { TEST_CONFIG } from '../utils/constants';
 
 export type EmployeeCleanup = {
-  trackUiEmployee: (employeeId: string) => void;
-  markUiEmployeeDeleted: (employeeId: string) => void;
+  trackEmployee: (employeeId: string) => void;
+  markEmployeeDeleted: (employeeId: string) => void;
 };
 
 export const test = base.extend<{ employeeCleanup: EmployeeCleanup }>({
   employeeCleanup: async ({ page }, use, testInfo) => {
-    const uiEmployeeIds = new Set<string>();
+    const employeeIds = new Set<string>();
 
     await use({
-      trackUiEmployee: (employeeId) => uiEmployeeIds.add(employeeId),
-      markUiEmployeeDeleted: (employeeId) => uiEmployeeIds.delete(employeeId)
+      trackEmployee: (employeeId) => employeeIds.add(employeeId),
+      markEmployeeDeleted: (employeeId) => employeeIds.delete(employeeId)
     });
 
     const cleanupErrors: string[] = [];
 
-    for (const employeeId of uiEmployeeIds) {
+    for (const employeeId of employeeIds) {
       try {
         await page.goto('/web/index.php/pim/viewEmployeeList');
 

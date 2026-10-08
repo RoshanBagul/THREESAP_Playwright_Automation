@@ -33,7 +33,10 @@ export class AddEmployeePage extends BasePage {
     }
 
     await Promise.all([
-      this.page.waitForURL(/\/pim\/viewPersonalDetails\//, { timeout: TIMEOUTS.navigation }),
+      this.page.waitForURL(/\/pim\/viewPersonalDetails\//, {
+        timeout: TIMEOUTS.navigation,
+        waitUntil: 'commit'
+      }),
       this.page.getByRole('button', { name: 'Save' }).click(),
     ]);
 
