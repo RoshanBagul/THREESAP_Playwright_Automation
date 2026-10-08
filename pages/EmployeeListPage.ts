@@ -6,9 +6,7 @@ export class EmployeeListPage extends BasePage {
     super(page);
   }
 
-  private employeeIdFilter = this.page
-    .locator('.oxd-input-group')
-    .filter({ hasText: 'Employee Id' })
+  private employeeIdFilter = this.inputGroup('Employee Id')
     .locator('input:visible')
     .first();
 
@@ -32,7 +30,7 @@ export class EmployeeListPage extends BasePage {
   }
 
   async verifyEmployeeVisible(employeeId: string) {
-    const resultRow = this.page.locator('.oxd-table-row').filter({ hasText: employeeId }).first();
+    const resultRow = this.tableRow(employeeId).first();
     await expect(resultRow).toBeVisible({ timeout: 15000 });
   }
 
@@ -42,14 +40,14 @@ export class EmployeeListPage extends BasePage {
   }
 
   async deleteEmployee(employeeId: string) {
-    const row = this.page.locator('.oxd-table-row').filter({ hasText: employeeId });
+    const row = this.tableRow(employeeId);
     await row.getByRole('button').last().click();
     await this.page.getByRole('button', { name: 'Yes, Delete' }).click();
-    await expect(this.page.getByText('Successfully Deleted', { exact: false })).toBeVisible({ timeout: 15000 });
+    await this.verifyToast('Successfully Deleted');
   }
 
   async verifyEmployeeDeleted(employeeId: string) {
     await this.searchByEmployeeId(employeeId);
-    await expect(this.page.locator('.oxd-table-row').filter({ hasText: employeeId })).toHaveCount(0, { timeout: 15000 });
+    await expect(this.tableRow(employeeId)).toHaveCount(0, { timeout: 15000 });
   }
 }

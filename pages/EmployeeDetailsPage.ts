@@ -16,29 +16,17 @@ export class EmployeeDetailsPage extends BasePage {
 
   async updateJobTitle(jobTitle: string) {
     await this.openJobTab();
-    const dropdown = this.page
-      .locator('.oxd-input-group')
-      .filter({ hasText: 'Job Title' })
-      .locator('.oxd-select-text')
-      .first();
-    await dropdown.click();
-    await this.page.getByText(jobTitle, { exact: true }).click();
+    await this.selectDropdownOption('Job Title', jobTitle);
   }
 
   async updateEmploymentStatus(status: string) {
     await this.openJobTab();
-    const dropdown = this.page
-      .locator('.oxd-input-group')
-      .filter({ hasText: 'Employment Status' })
-      .locator('.oxd-select-text')
-      .first();
-    await dropdown.click();
-    await this.page.getByText(status, { exact: true }).click();
+    await this.selectDropdownOption('Employment Status', status);
   }
 
   async save() {
     await this.page.getByRole('button', { name: 'Save' }).click();
-    await expect(this.page.getByText('Successfully Updated', { exact: false })).toBeVisible({ timeout: 15000 });
+    await this.verifyToast('Successfully Updated');
   }
 
   async verifyJobTitle(jobTitle: string) {

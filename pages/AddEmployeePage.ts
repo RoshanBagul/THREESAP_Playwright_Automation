@@ -20,11 +20,7 @@ export class AddEmployeePage extends BasePage {
     await this.firstName.fill(data.firstName);
     await this.lastName.fill(data.lastName);
 
-    const employeeIdInput = this.page
-      .locator('.oxd-input-group')
-      .filter({ hasText: 'Employee Id' })
-      .locator('input')
-      .first();
+    const employeeIdInput = this.inputGroup('Employee Id').locator('input').first();
 
     await expect(employeeIdInput).toBeVisible({ timeout: 15000 });
 
