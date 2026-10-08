@@ -13,7 +13,7 @@ This document covers the login functionality currently implemented in the projec
 | TC ID | Test Case | Preconditions | Steps | Expected Result |
 |------|-----------|---------------|-------|-----------------|
 | TC-01 | Verify login page loads successfully | User is on the application base URL | 1. Open the login page 2. Observe the page | Login form is displayed with username, password, and login button |
-| TC-02 | Verify valid admin login | User has valid credentials (Admin / admin123) | 1. Enter valid username 2. Enter valid password 3. Click Login | User is redirected to the Dashboard and dashboard heading is visible |
+| TC-02 | Verify valid admin login | User has valid credentials configured for the selected environment | 1. Enter valid username 2. Enter valid password 3. Click Login | User is redirected to the Dashboard and dashboard heading is visible |
 | TC-03 | Verify empty username field | User is on login page | 1. Leave username empty 2. Enter a valid password 3. Click Login | Login should not proceed and validation message or field error should be shown |
 | TC-04 | Verify empty password field | User is on login page | 1. Enter valid username 2. Leave password empty 3. Click Login | Login should not proceed and validation message or field error should be shown |
 | TC-05 | Verify both fields empty | User is on login page | 1. Leave username empty 2. Leave password empty 3. Click Login | Login should not proceed and validation messages should be displayed |

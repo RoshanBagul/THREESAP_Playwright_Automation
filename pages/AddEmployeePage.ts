@@ -1,6 +1,7 @@
 import { expect, Page } from '@playwright/test';
 import path from 'path';
 import { BasePage } from './BasePage';
+import TIMEOUTS from '../utils/timeouts.json';
 
 export interface EmployeeInput {
   firstName: string;
@@ -22,7 +23,7 @@ export class AddEmployeePage extends BasePage {
 
     const employeeIdInput = this.inputGroup('Employee Id').locator('input').first();
 
-    await expect(employeeIdInput).toBeVisible({ timeout: 15000 });
+    await expect(employeeIdInput).toBeVisible({ timeout: TIMEOUTS.assertion });
 
     await employeeIdInput.fill(data.employeeId);
 
@@ -32,11 +33,12 @@ export class AddEmployeePage extends BasePage {
     }
 
     await Promise.all([
-      this.page.waitForURL(/\/pim\/viewPersonalDetails\//, { timeout: 15000 }),
+      this.page.waitForURL(/\/pim\/viewPersonalDetails\//, { timeout: TIMEOUTS.navigation }),
       this.page.getByRole('button', { name: 'Save' }).click(),
     ]);
 
-    await expect(this.page.getByRole('heading', { name: 'Personal Details' })).toBeVisible({ timeout: 15000 });
+    await expect(this.page.getByRole('heading', { name: 'Personal Details' }))
+      .toBeVisible({ timeout: TIMEOUTS.assertion });
 
     const employeeNumber = new URL(this.page.url()).pathname
       .match(/\/viewPersonalDetails\/empNumber\/(\d+)/)?.[1];

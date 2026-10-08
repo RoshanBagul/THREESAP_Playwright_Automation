@@ -1,5 +1,6 @@
 import { Page, expect } from '@playwright/test';
 import { BasePage } from './BasePage';
+import TIMEOUTS from '../utils/timeouts.json';
 
 export class EmployeeDetailsPage extends BasePage {
   constructor(page: Page) {
@@ -11,7 +12,7 @@ export class EmployeeDetailsPage extends BasePage {
     if (currentUrl.includes('/viewPersonalDetails/')) {
       await this.page.goto(currentUrl.replace('/viewPersonalDetails/', '/viewJobDetails/'));
     }
-    await expect(this.page).toHaveURL(/\/viewJobDetails\//, { timeout: 15000 });
+    await expect(this.page).toHaveURL(/\/viewJobDetails\//, { timeout: TIMEOUTS.navigation });
   }
 
   async updateJobTitle(jobTitle: string) {

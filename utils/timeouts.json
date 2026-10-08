@@ -1,0 +1,6 @@
+{
+  "action": 15000,
+  "navigation": 30000,
+  "assertion": 15000,
+  "employeeLifecycleTest": 120000
+}

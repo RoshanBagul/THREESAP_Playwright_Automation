@@ -1,4 +1,5 @@
 import { expect, Locator, Page } from '@playwright/test';
+import TIMEOUTS from '../utils/timeouts.json';
 
 export class BasePage {
   constructor(protected readonly page: Page) {}
@@ -18,7 +19,7 @@ export class BasePage {
 
   protected async verifyToast(message: string) {
     await expect(this.page.getByText(message, { exact: false }))
-      .toBeVisible({ timeout: 15000 });
+      .toBeVisible({ timeout: TIMEOUTS.assertion });
   }
 
   protected async verifyUrl(url: RegExp) {

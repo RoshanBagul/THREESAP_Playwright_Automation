@@ -1,6 +1,7 @@
 import { defineConfig } from '@playwright/test';
 import path from 'node:path';
 import { ENVIRONMENT_CONFIG } from './utils/environment';
+import TIMEOUTS from './utils/timeouts.json';
 
 const authFile = (browserName: string, role: 'admin' | 'ess') =>
     path.resolve(__dirname, `.auth/${browserName}/${role}.json`);
@@ -36,9 +37,13 @@ export default defineConfig({
 
         trace: 'on-first-retry',
 
-        actionTimeout: 15000,
+        actionTimeout: TIMEOUTS.action,
 
-        navigationTimeout: 30000
+        navigationTimeout: TIMEOUTS.navigation
+    },
+
+    expect: {
+        timeout: TIMEOUTS.assertion
     },
 
     projects: [

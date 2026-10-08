@@ -8,10 +8,11 @@ import { EmployeeDetailsPage } from '../pages/EmployeeDetailsPage';
 import { EmployeeApi } from '../api/EmployeeApi';
 import { generateEmployeeId, generateUniqueEmployeeName } from '../utils/testDataGenerator';
 import employeeData from '../data/employeeData.json';
+import TIMEOUTS from '../utils/timeouts.json';
 
 test.describe('OrangeHRM - Employee Lifecycle', { tag: '@regression' }, () => {
   test('should add, edit, delete and logout an employee', async ({ page, employeeCleanup }) => {
-    test.setTimeout(120000);
+    test.setTimeout(TIMEOUTS.employeeLifecycleTest);
 
     const dashboard = new DashboardPage(page);
     const pim = new PimPage(page);

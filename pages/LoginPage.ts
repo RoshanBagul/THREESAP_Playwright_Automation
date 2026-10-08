@@ -1,5 +1,6 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { BasePage } from './BasePage';
+import TIMEOUTS from '../utils/timeouts.json';
 
 export class LoginPage extends BasePage {
   private readonly usernameInput: Locator;
@@ -27,12 +28,12 @@ export class LoginPage extends BasePage {
 
   async verifyInvalidCredentials() {
     await expect(this.page.getByText('Invalid credentials', { exact: false }))
-      .toBeVisible({ timeout: 15000 });
+      .toBeVisible({ timeout: TIMEOUTS.assertion });
   }
 
   async verifyRequiredFieldCount(count: number) {
     await expect(this.page.getByText('Required', { exact: false }))
-      .toHaveCount(count, { timeout: 15000 });
+      .toHaveCount(count, { timeout: TIMEOUTS.assertion });
   }
 
   async verifyLoginFormVisible() {

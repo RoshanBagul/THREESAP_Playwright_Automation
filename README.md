@@ -73,10 +73,9 @@ also set `ORANGEHRM_ESS_USERNAME` and `ORANGEHRM_ESS_PASSWORD` to an existing ES
 both must be set together. Those checks verify that ESS can see `My Info` but cannot
 see the `Admin` or `PIM` menus, while Admin sees the administrative menus. Without
 ESS credentials, the Admin menu test still runs and the ESS-specific test is reported
-as skipped. GitHub Actions defaults to the public OrangeHRM demo account when
-`ORANGEHRM_USERNAME` and `ORANGEHRM_PASSWORD` secrets are absent. For private or
-staging environments, configure `ORANGEHRM_BASE_URL` as a repository variable and
-set both credentials as repository secrets to override those demo defaults.
+as skipped. For GitHub Actions, configure `ORANGEHRM_BASE_URL` as a repository
+variable and `ORANGEHRM_USERNAME` and `ORANGEHRM_PASSWORD` as repository secrets.
+The workflow stops with a clear error if any of these required values are missing.
 Optionally configure
 `ORANGEHRM_ESS_USERNAME` and `ORANGEHRM_ESS_PASSWORD` as secrets to enable the ESS
 checks.
@@ -196,6 +195,7 @@ The Playwright config uses:
 - Chromium, Firefox, and WebKit projects
 - a setup project that saves authenticated storage state to the ignored `.auth/` directory for reuse across browser projects
 - the login spec uses an empty storage state so authentication scenarios still exercise the login UI
+- shared action, navigation, assertion, and lifecycle timeouts are maintained in `utils/timeouts.json`
 - a fixed 1280x800 viewport across browsers
 - three CI workers so browser projects can run concurrently
 - headed mode enabled in local runs

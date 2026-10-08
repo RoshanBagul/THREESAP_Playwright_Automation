@@ -1,6 +1,5 @@
 {
   "employee": {
-    "firstName": "Roshan",
     "lastName": "Automation",
     "jobTitle": "QA Engineer",
     "employmentStatus": "Full-Time Permanent"

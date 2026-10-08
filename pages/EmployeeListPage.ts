@@ -1,5 +1,6 @@
 import { Page, expect } from '@playwright/test';
 import { BasePage } from './BasePage';
+import TIMEOUTS from '../utils/timeouts.json';
 
 export class EmployeeListPage extends BasePage {
   constructor(page: Page) {
@@ -31,7 +32,7 @@ export class EmployeeListPage extends BasePage {
 
   async verifyEmployeeVisible(employeeId: string) {
     const resultRow = this.tableRow(employeeId).first();
-    await expect(resultRow).toBeVisible({ timeout: 15000 });
+    await expect(resultRow).toBeVisible({ timeout: TIMEOUTS.assertion });
   }
 
   async openEmployee(employeeId: string) {
@@ -48,6 +49,6 @@ export class EmployeeListPage extends BasePage {
 
   async verifyEmployeeDeleted(employeeId: string) {
     await this.searchByEmployeeId(employeeId);
-    await expect(this.tableRow(employeeId)).toHaveCount(0, { timeout: 15000 });
+    await expect(this.tableRow(employeeId)).toHaveCount(0, { timeout: TIMEOUTS.assertion });
   }
 }
