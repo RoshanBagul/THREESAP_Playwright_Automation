@@ -12,4 +12,6 @@ npm-debug.log*
 coverage/
 .env
 .env.local
+.env.*
+!.env.example
 .git

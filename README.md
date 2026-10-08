@@ -22,11 +22,13 @@ threesap_automation/
 ├── pages/
 ├── tests/
 ├── utils/
+│   └── environment.ts
 ├── playwright.config.ts
 ├── package.json
 ├── tsconfig.json
 ├── README.md
 ├── TEST_CASES.md
+├── .env.example
 ├── playwright-report/
 ├── test-results/
 ├── test-assets/
@@ -47,6 +49,35 @@ From the project root:
 ```bash
 npm install
 npx playwright install chromium firefox webkit
+```
+
+## Environment Configuration
+
+Runtime settings are loaded from environment variables. For local development, copy
+`.env.example` to `.env.local` and provide the test account credentials:
+
+```powershell
+Copy-Item .env.example .env.local
+```
+
+The supported `TEST_ENV` values are `local` (the default), `staging`, and `production`.
+The runner loads `.env.<TEST_ENV>` first, then `.env` as a shared fallback; variables
+already set in the process take precedence over both files. Create files such as
+`.env.staging` for environment-specific settings. These files are ignored by Git.
+
+The required variables are `ORANGEHRM_BASE_URL`, `ORANGEHRM_USERNAME`,
+`ORANGEHRM_PASSWORD`, and `EMPLOYEE_API_BASE_URL`. `REQRES_API_KEY` is optional when
+the configured API does not require authentication. For GitHub Actions, configure
+the URLs as repository variables named `ORANGEHRM_BASE_URL` and
+`EMPLOYEE_API_BASE_URL`, and configure the credentials as repository secrets named
+`ORANGEHRM_USERNAME` and `ORANGEHRM_PASSWORD`; `REQRES_API_KEY` can also be set as a
+secret when needed.
+
+To run against another local profile, set `TEST_ENV` before invoking Playwright:
+
+```powershell
+$env:TEST_ENV = "staging"
+npm test
 ```
 
 On Windows, if `npm` is not recognized in PowerShell, first add Node to PATH or call it explicitly:
@@ -149,7 +180,7 @@ If a scenario fails, the relevant failure artifacts (including video) are saved 
 
 The Playwright config uses:
 
-- base URL: `https://opensource-demo.orangehrmlive.com`
+- base URL from `ORANGEHRM_BASE_URL` in the selected environment configuration
 - Chromium, Firefox, and WebKit projects
 - a fixed 1280x800 viewport across browsers
 - three CI workers so browser projects can run concurrently

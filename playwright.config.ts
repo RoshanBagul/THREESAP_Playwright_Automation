@@ -1,4 +1,5 @@
 import { defineConfig } from '@playwright/test';
+import { ENVIRONMENT_CONFIG } from './utils/environment';
 
 export default defineConfig({
     testDir: './tests',
@@ -19,7 +20,7 @@ export default defineConfig({
     ],
 
     use: {
-        baseURL: 'https://opensource-demo.orangehrmlive.com',
+        baseURL: ENVIRONMENT_CONFIG.orangeHrmBaseUrl,
 
         headless: !!process.env.CI,
 

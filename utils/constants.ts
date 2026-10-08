@@ -1,4 +1,6 @@
+import { ENVIRONMENT_CONFIG } from './environment';
+
 export const TEST_CONFIG = {
-  username: 'Admin',
-  password: 'admin123'
+  username: ENVIRONMENT_CONFIG.orangeHrmUsername,
+  password: ENVIRONMENT_CONFIG.orangeHrmPassword
 };

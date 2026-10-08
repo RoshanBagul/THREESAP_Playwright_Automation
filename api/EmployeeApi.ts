@@ -1,4 +1,5 @@
 import { APIRequestContext, expect } from '@playwright/test';
+import { ENVIRONMENT_CONFIG } from '../utils/environment';
 
 export interface ApiEmployee {
   name: string;
@@ -8,13 +9,13 @@ export interface ApiEmployee {
 }
 
 export class EmployeeApi {
-  private readonly baseURL = 'https://reqres.in';
+  private readonly baseURL = ENVIRONMENT_CONFIG.employeeApiBaseUrl;
 
   constructor(private readonly request: APIRequestContext) {}
 
   private headers(): Record<string, string> {
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-    if (process.env.REQRES_API_KEY) headers['x-api-key'] = process.env.REQRES_API_KEY;
+    if (ENVIRONMENT_CONFIG.employeeApiKey) headers['x-api-key'] = ENVIRONMENT_CONFIG.employeeApiKey;
     return headers;
   }
 
